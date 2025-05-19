@@ -5,3 +5,8 @@ Reutiliser navbar dans /article
 faire le design des articles, lister.
 Page /admin pour l admin creer, editer, suprimer facilement? Bundle admin de symfony 
 
+ Do you want to send an email to verify the user's email address after registration? (yes/no) [yes]:      
+ > no
+
+ Do you want to automatically authenticate the user after registration? (yes/no) [yes]:
+ > yes
