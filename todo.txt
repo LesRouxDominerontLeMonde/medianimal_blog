@@ -1,0 +1,7 @@
+twig ->
+Separer navbar et le body
+
+Reutiliser navbar dans /article
+faire le design des articles, lister.
+Page /admin pour l admin creer, editer, suprimer facilement? Bundle admin de symfony 
+
