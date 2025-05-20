@@ -10,3 +10,7 @@ Page /admin pour l admin creer, editer, suprimer facilement? Bundle admin de sym
 
  Do you want to automatically authenticate the user after registration? (yes/no) [yes]:
  > yes
+
+
+ 20/05
+ admin articlecrudcontroller => edition d'article ou creation article, mettre le trumbowyg .

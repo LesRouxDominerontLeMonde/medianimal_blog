@@ -4,9 +4,12 @@ namespace App\Controller\Admin;
 
 use App\Entity\Article;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
+use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
+use Symfony\Component\Validator\Constraints\Date;
 
 class ArticleCrudController extends AbstractCrudController
 {
@@ -15,14 +18,20 @@ class ArticleCrudController extends AbstractCrudController
         return Article::class;
     }
 
-    /*
     public function configureFields(string $pageName): iterable
     {
         return [
-            IdField::new('id'),
             TextField::new('title'),
-            TextEditorField::new('description'),
+            TextareaField::new('content')
+                ->setFormTypeOption('attr',['class' => 'trumbowyg-editor']),
+            DateTimeField::new('createdAt')
+                /*
+                ->setFormTypeOption('attr',['class' => 'trumbowyg-editor'])
+                ->setFormTypeOption('widget', 'single_text')
+                ->setFormTypeOption('html5', false)
+                ->setFormTypeOption('format', 'dd/MM/yyyy HH:mm')
+                ->setFormTypeOption('placeholder', 'dd/MM/yyyy HH:mm'),
+                */
         ];
     }
-    */
 }
