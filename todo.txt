@@ -13,4 +13,8 @@ Page /admin pour l admin creer, editer, suprimer facilement? Bundle admin de sym
 
 
  20/05
- admin articlecrudcontroller => edition d'article ou creation article, mettre le trumbowyg .
+    admin articlecrudcontroller => edition d'article ou creation article, mettre le trumbowyg .
+
+    instalation de webpack encore
+    re instalation de trumbowyg et jquery avec npm pour qu'ils soient dans le packages.json de webpack encore
+    Webpack essaie de compiler ton fichier assets/bootstrap.js qui importe @symfony/stimulus-bundle, mais ce package n’est pas installé.
