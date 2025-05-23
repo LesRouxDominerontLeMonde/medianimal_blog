@@ -3,6 +3,6 @@
   "build/app.js": "/build/app.js",
   "build/admin.js": "/build/admin.js",
   "build/runtime.js": "/build/runtime.js",
-  "build/vendors-node_modules_jquery_dist_jquery_js-node_modules_trumbowyg_dist_ui_trumbowyg_min_css-n-a40463.css": "/build/vendors-node_modules_jquery_dist_jquery_js-node_modules_trumbowyg_dist_ui_trumbowyg_min_css-n-a40463.css",
-  "build/vendors-node_modules_jquery_dist_jquery_js-node_modules_trumbowyg_dist_ui_trumbowyg_min_css-n-a40463.js": "/build/vendors-node_modules_jquery_dist_jquery_js-node_modules_trumbowyg_dist_ui_trumbowyg_min_css-n-a40463.js"
+  "build/vendors-node_modules_trumbowyg_dist_ui_trumbowyg_min_css-node_modules_trumbowyg_dist_trumbowyg_js.css": "/build/vendors-node_modules_trumbowyg_dist_ui_trumbowyg_min_css-node_modules_trumbowyg_dist_trumbowyg_js.css",
+  "build/vendors-node_modules_trumbowyg_dist_ui_trumbowyg_min_css-node_modules_trumbowyg_dist_trumbowyg_js.js": "/build/vendors-node_modules_trumbowyg_dist_ui_trumbowyg_min_css-node_modules_trumbowyg_dist_trumbowyg_js.js"
 }

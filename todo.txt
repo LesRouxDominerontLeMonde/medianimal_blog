@@ -11,6 +11,8 @@ Page /admin pour l admin creer, editer, suprimer facilement? Bundle admin de sym
  Do you want to automatically authenticate the user after registration? (yes/no) [yes]:
  > yes
 
+articlecrudcontroller , importation du js de admin (ou en l'occurence de build/amins.js une fois compiler par webpack)
+
 
  20/05
     admin articlecrudcontroller => edition d'article ou creation article, mettre le trumbowyg .
@@ -18,3 +20,4 @@ Page /admin pour l admin creer, editer, suprimer facilement? Bundle admin de sym
     instalation de webpack encore
     re instalation de trumbowyg et jquery avec npm pour qu'ils soient dans le packages.json de webpack encore
     Webpack essaie de compiler ton fichier assets/bootstrap.js qui importe @symfony/stimulus-bundle, mais ce package n’est pas installé.
+

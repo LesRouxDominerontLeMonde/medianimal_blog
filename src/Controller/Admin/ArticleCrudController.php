@@ -10,6 +10,9 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use Symfony\Component\Validator\Constraints\Date;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
+
 
 class ArticleCrudController extends AbstractCrudController
 {
@@ -34,4 +37,11 @@ class ArticleCrudController extends AbstractCrudController
                 */
         ];
     }
+
+    public function configureAssets(Assets $assets): Assets
+    {
+        return Assets::new()
+            ->addWebpackEncoreEntry('admin'); // charge build/admin.js et build/admin.css
+    }
+
 }
