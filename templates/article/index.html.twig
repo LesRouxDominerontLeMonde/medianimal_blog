@@ -12,7 +12,6 @@
                 <th>Title</th>
                 <th>Content</th>
                 <th>CreatedAt</th>
-                <th>actions</th>
             </tr>
         </thead>
         <tbody>
@@ -22,10 +21,6 @@
                 <td>{{ article.title }}</td>
                 <td>{{ article.content }}</td>
                 <td>{{ article.createdAt ? article.createdAt|date('Y-m-d H:i:s') : '' }}</td>
-                <td>
-                    <a href="{{ path('app_article_show', {'id': article.id}) }}">show</a>
-                    <a href="{{ path('app_article_edit', {'id': article.id}) }}">edit</a>
-                </td>
             </tr>
         {% else %}
             <tr>
@@ -35,5 +30,4 @@
         </tbody>
     </table>
 
-    <a href="{{ path('app_article_new') }}">Create new</a>
 {% endblock %}

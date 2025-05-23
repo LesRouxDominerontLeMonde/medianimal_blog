@@ -1,12 +1,11 @@
 import $ from 'jquery';
-window.$ = $;
-window.jQuery = $;
-
 import 'trumbowyg';
 import 'trumbowyg/dist/ui/trumbowyg.min.css';
 
 function initTrumbowyg() {
-  $('.trumbowyg-editor').trumbowyg();
+  $('.trumbowyg-editor').trumbowyg({
+    svgPath: '/build/ui/icons.svg' // Chemin vers les icônes SVG copiées dans public/build/ui/
+  });
 }
 
 $(function () {
