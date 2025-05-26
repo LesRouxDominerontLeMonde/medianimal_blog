@@ -27,7 +27,8 @@ class ArticleCrudController extends AbstractCrudController
             TextField::new('title'),
             TextareaField::new('content')
                 ->setFormTypeOption('attr',['class' => 'trumbowyg-editor']),
-            DateTimeField::new('createdAt')
+            DateTimeField::new('createdAt'),
+            DateTimeField::new('publishedAt')
                 /*
                 ->setFormTypeOption('attr',['class' => 'trumbowyg-editor'])
                 ->setFormTypeOption('widget', 'single_text')
