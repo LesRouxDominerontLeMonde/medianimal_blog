@@ -26,7 +26,7 @@ class ArticleCrudController extends AbstractCrudController
         return [
             TextField::new('title'),
             TextareaField::new('content')
-                ->setFormTypeOption('attr',['class' => 'trumbowyg-editor']),
+                ->setFormTypeOption('attr', ['class' => 'trumbowyg-editor']),
             DateTimeField::new('createdAt'),
             DateTimeField::new('publishedAt')
                 /*
@@ -38,11 +38,4 @@ class ArticleCrudController extends AbstractCrudController
                 */
         ];
     }
-
-    public function configureAssets(Assets $assets): Assets
-    {
-        return Assets::new()
-            ->addWebpackEncoreEntry('admin'); // charge build/admin.js et build/admin.css
-    }
-
 }
