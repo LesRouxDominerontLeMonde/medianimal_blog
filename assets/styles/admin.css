@@ -1,0 +1,21 @@
+/* Styles pour l'interface d'administration */
+/* Styles pour titre trop long >110 caractères par exemple */
+.title-warning {
+    color: #dc3545;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+    display: none;
+    font-weight: 500;
+    border-left: 3px solid #dc3545;
+    padding-left: 0.5rem;
+}
+
+.title-warning.show {
+    display: block;
+    animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+} 

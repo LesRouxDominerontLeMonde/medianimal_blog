@@ -3,6 +3,7 @@
 {% block head_stylesheets %}
     {{ parent() }}
     <link rel="stylesheet" href="{{ asset('styles/trumbowyg.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('styles/admin.css') }}">
 {% endblock %}
 
 {% block body_javascript %}
@@ -29,6 +30,43 @@
                 ]
             });
 
+            // Fonction pour initialiser la validation du titre
+            function initTitleValidation() {
+                // Chercher le champ titre (peut avoir différents noms selon EasyAdmin)
+                const titleInputs = $('input[name*="title"], input[id*="title"], input[name*="Title"], input[id*="Title"]');
+                
+                titleInputs.each(function() {
+                    const $input = $(this);
+                    const $container = $input.closest('.form-group, .field-group, .ea-form-field');
+                    
+                    // Éviter de dupliquer les avertissements
+                    if ($container.find('.title-warning').length === 0) {
+                        // Ajouter l'élément d'avertissement
+                        const $warning = $('<div class="title-warning">Mieux si titre &lt; 110 caractères</div>');
+                        $input.after($warning);
+                        
+                        // Fonction de validation
+                        function validateTitle() {
+                            const titleLength = $input.val().length;
+                            if (titleLength > 110) {
+                                $warning.addClass('show');
+                            } else {
+                                $warning.removeClass('show');
+                            }
+                        }
+                        
+                        // Écouter les changements
+                        $input.on('input keyup paste', validateTitle);
+                        
+                        // Validation initiale
+                        validateTitle();
+                    }
+                });
+            }
+
+            // Initialiser la validation du titre
+            initTitleValidation();
+
             // Observer pour les éléments ajoutés dynamiquement
             const observer = new MutationObserver(function(mutations) {
                 mutations.forEach(function(mutation) {
@@ -53,6 +91,9 @@
                                     ]
                                 });
                             });
+                            
+                            // Réinitialiser la validation du titre pour les nouveaux éléments
+                            initTitleValidation();
                         }
                     });
                 });
