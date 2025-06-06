@@ -6,6 +6,7 @@ use App\Entity\Article;
 use App\Form\ArticleForm;
 use App\Repository\ArticleRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -18,8 +19,10 @@ final class ArticleController extends AbstractController
     public function index(ArticleRepository $articleRepository): Response
     {
         $articles = $articleRepository->createQueryBuilder('a')
-            ->where('a.publishedAt IS NOT NULL')
+            ->where('a.isPublished = :published')
+            ->andWhere('a.publishedAt IS NOT NULL')
             ->andWhere('a.publishedAt <= :now')
+            ->setParameter('published', true)
             ->setParameter('now', new \DateTimeImmutable())
             ->orderBy('a.publishedAt', 'DESC')
             ->getQuery()
@@ -30,14 +33,39 @@ final class ArticleController extends AbstractController
         ]);
     }
 
+    #[Route('/blog', name: 'app_blog', methods: ['GET'])]
+    public function blog(Request $request, ArticleRepository $articleRepository): Response
+    {
+        $page = $request->query->getInt('page', 1);
+        $limit = 6; // Nombre d'articles par page
+
+        $queryBuilder = $articleRepository->createQueryBuilder('a')
+            ->where('a.isPublished = :published')
+            ->andWhere('a.publishedAt IS NOT NULL')
+            ->andWhere('a.publishedAt <= :now')
+            ->setParameter('published', true)
+            ->setParameter('now', new \DateTimeImmutable())
+            ->orderBy('a.publishedAt', 'DESC')
+            ->setFirstResult(($page - 1) * $limit)
+            ->setMaxResults($limit);
+
+        $paginator = new Paginator($queryBuilder);
+        $totalArticles = count($paginator);
+        $totalPages = ceil($totalArticles / $limit);
+
+        return $this->render('blog/index.html.twig', [
+            'articles' => $paginator,
+            'currentPage' => $page,
+            'totalPages' => $totalPages,
+            'totalArticles' => $totalArticles,
+        ]);
+    }
+
     #[Route('/{id}', name: 'app_article_show', methods: ['GET'])]
     public function show(Article $article): Response
     {
-        if (
-            $article->getPublishedAt() === null ||
-            $article->getPublishedAt() > new \DateTimeImmutable()
-        ) {
-            throw $this->createNotFoundException();
+        if (!$article->isVisible()) {
+            throw $this->createNotFoundException('Cet article n\'est pas disponible.');
         }
 
         return $this->render('article/show.html.twig', [

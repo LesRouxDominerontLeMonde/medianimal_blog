@@ -3,13 +3,16 @@
 namespace App\Entity;
 
 use App\Repository\ArticleRepository;
+use App\Validator\RequiredMainImage;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\Validator\Constraints as Assert;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
 #[ORM\Entity(repositoryClass: ArticleRepository::class)]
 #[Vich\Uploadable]
+#[RequiredMainImage]
 class Article
 {
     #[ORM\Id]
@@ -29,14 +32,50 @@ class Article
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $publishedAt = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $image = null;
+    #[ORM\Column(type: Types::BOOLEAN, options: ['default' => false])]
+    private bool $isPublished = false;
+
+    // Image principale (obligatoire)
+    #[ORM\Column(length: 255)]
+    private ?string $imageMainPath = null;
 
     /**
      * @var File|null
      */
-    #[Vich\UploadableField(mapping: 'article_images', fileNameProperty: 'image')]
-    private ?File $imageFile = null;
+    #[Vich\UploadableField(mapping: 'article_images', fileNameProperty: 'imageMainPath')]
+    #[Assert\Image(
+        mimeTypes: ['image/jpeg', 'image/png', 'image/webp'],
+        mimeTypesMessage: 'Seuls les formats JPEG, PNG et WebP sont autorisés',
+        maxSize: '2M',
+        maxSizeMessage: 'Image trop lourde, max 2 Mo',
+        minPixels: 50000,
+        minPixelsMessage: 'L\'image doit contenir au minimum 50 000 pixels'
+    )]
+    private ?File $imageMainFile = null;
+
+    // Image alternative (optionnelle)
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $imageAltPath = null;
+
+    /**
+     * @var File|null
+     */
+    #[Vich\UploadableField(mapping: 'article_images', fileNameProperty: 'imageAltPath')]
+    #[Assert\Image(
+        mimeTypes: ['image/jpeg', 'image/png', 'image/webp'],
+        mimeTypesMessage: 'Seuls les formats JPEG, PNG et WebP sont autorisés',
+        maxSize: '2M',
+        maxSizeMessage: 'Image trop lourde, max 2 Mo',
+        minPixels: 50000,
+        minPixelsMessage: 'L\'image doit contenir au minimum 50 000 pixels'
+    )]
+    private ?File $imageAltFile = null;
+
+    public function __construct()
+    {
+        $this->createdAt = new \DateTimeImmutable();
+        $this->isPublished = false;
+    }
 
     public function getId(): ?int
     {
@@ -91,30 +130,93 @@ class Article
         return $this;
     }
 
-    public function getImage(): ?string
+    public function isPublished(): bool
     {
-        return $this->image;
+        return $this->isPublished;
     }
 
-    public function setImage(?string $image): static
+    public function setIsPublished(bool $isPublished): static
     {
-        $this->image = $image;
+        $this->isPublished = $isPublished;
 
         return $this;
     }
 
-    public function setImageFile(?File $imageFile = null): void
+    /**
+     * Vérifie si l'article est visible publiquement
+     * Un article est visible si :
+     * - isPublished = true
+     * - publishedAt est défini et <= maintenant
+     */
+    public function isVisible(): bool
     {
-        $this->imageFile = $imageFile;
+        return $this->isPublished 
+            && $this->publishedAt !== null 
+            && $this->publishedAt <= new \DateTimeImmutable();
+    }
 
-        if ($imageFile !== null) {
+    /**
+     * Vérifie si l'article a une image principale
+     * (soit un fichier uploadé, soit un chemin existant)
+     */
+    public function hasMainImage(): bool
+    {
+        return $this->imageMainFile !== null || !empty($this->imageMainPath);
+    }
+
+    // Méthodes pour l'image principale
+    public function getImageMainPath(): ?string
+    {
+        return $this->imageMainPath;
+    }
+
+    public function setImageMainPath(?string $imageMainPath): static
+    {
+        $this->imageMainPath = $imageMainPath;
+
+        return $this;
+    }
+
+    public function setImageMainFile(?File $imageMainFile = null): void
+    {
+        $this->imageMainFile = $imageMainFile;
+
+        if ($imageMainFile !== null) {
             // Pour forcer Doctrine à détecter un changement
             $this->createdAt = new \DateTimeImmutable();
         }
     }
 
-    public function getImageFile(): ?File
+    public function getImageMainFile(): ?File
     {
-        return $this->imageFile;
+        return $this->imageMainFile;
+    }
+
+    // Méthodes pour l'image alternative
+    public function getImageAltPath(): ?string
+    {
+        return $this->imageAltPath;
+    }
+
+    public function setImageAltPath(?string $imageAltPath): static
+    {
+        $this->imageAltPath = $imageAltPath;
+
+        return $this;
+    }
+
+    public function setImageAltFile(?File $imageAltFile = null): void
+    {
+        $this->imageAltFile = $imageAltFile;
+
+        if ($imageAltFile !== null) {
+            // Pour forcer Doctrine à détecter un changement
+            $this->createdAt = new \DateTimeImmutable();
+        }
+    }
+
+    public function getImageAltFile(): ?File
+    {
+        return $this->imageAltFile;
     }
 }

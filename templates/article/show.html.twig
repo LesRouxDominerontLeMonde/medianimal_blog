@@ -1,34 +1,178 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Article{% endblock %}
+{% block title %}{{ article.title }} - Medianimal{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('styles/article.css') }}">
+    
+    <!-- Meta tags essentiels pour Google News -->
+    <meta name="description" content="{{ article.content|striptags|slice(0, 160) }}">
+    <meta name="keywords" content="medianimal, bien-être animal, {{ article.title|lower }}">
+    <meta name="author" content="Medianimal">
+    <meta name="robots" content="index, follow">
+    <meta name="googlebot" content="index, follow">
+    <meta name="googlebot-news" content="index, follow">
+    
+    <!-- Open Graph pour les réseaux sociaux -->
+    <meta property="og:title" content="{{ article.title }}">
+    <meta property="og:description" content="{{ article.content|striptags|slice(0, 160) }}">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="{{ app.request.uri }}">
+    {% if article.imageMainPath %}
+        <meta property="og:image" content="{{ absolute_url(asset('images/articles/' ~ article.imageMainPath)) }}">
+    {% endif %}
+    <meta property="og:site_name" content="Medianimal">
+    <meta property="article:published_time" content="{{ article.publishedAt|date('c') }}">
+    <meta property="article:modified_time" content="{{ article.createdAt|date('c') }}">
+    <meta property="article:section" content="Bien-être animal">
+    
+    <!-- Twitter Cards -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ article.title }}">
+    <meta name="twitter:description" content="{{ article.content|striptags|slice(0, 160) }}">
+    {% if article.imageMainPath %}
+        <meta name="twitter:image" content="{{ absolute_url(asset('images/articles/' ~ article.imageMainPath)) }}">
+    {% endif %}
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="{{ app.request.uri }}">
+    
+    <!-- JSON-LD Schema.org pour Google News -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "NewsArticle",
+        "headline": "{{ article.title|e('js') }}",
+        "description": "{{ article.content|striptags|slice(0, 160)|e('js') }}",
+        "image": {% if article.imageMainPath %}"{{ absolute_url(asset('images/articles/' ~ article.imageMainPath)) }}"{% else %}null{% endif %},
+        "author": {
+            "@type": "Organization",
+            "name": "Medianimal",
+            "url": "{{ absolute_url(path('app_blog')) }}"
+        },
+        "publisher": {
+            "@type": "Organization",
+            "name": "Medianimal",
+            "logo": {
+                "@type": "ImageObject",
+                "url": "{{ absolute_url(asset('images/logo.png')) }}",
+                "width": 200,
+                "height": 60
+            }
+        },
+        "datePublished": "{{ article.publishedAt|date('c') }}",
+        "dateModified": "{{ article.createdAt|date('c') }}",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "{{ app.request.uri }}"
+        },
+        "articleSection": "Bien-être animal",
+        "keywords": "medianimal, bien-être animal, {{ article.title|lower|e('js') }}",
+        "wordCount": {{ article.content|striptags|split(' ')|length }},
+        "isAccessibleForFree": true,
+        "hasPart": {
+            "@type": "WebPageElement",
+            "@id": "{{ app.request.uri }}#article-body"
+        }
+    }
+    </script>
+{% endblock %}
 
 {% block body %}
-    <h1>Article</h1>
+<article class="article-container" itemscope itemtype="https://schema.org/NewsArticle">
+    <!-- Breadcrumb Navigation -->
+    <nav class="breadcrumb" aria-label="Fil d'Ariane">
+        <a href="{{ path('app_blog') }}">Blog</a>
+        <span class="breadcrumb-separator">›</span>
+        <span class="breadcrumb-current">{{ article.title }}</span>
+    </nav>
 
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ article.id }}</td>
-            </tr>
-            <tr>
-                <th>Title</th>
-                <td>{{ article.title }}</td>
-            </tr>
-            <tr>
-                <th>Content</th>
-                <td>{{ article.content }}</td>
-            </tr>
-            <tr>
-                <th>CreatedAt</th>
-                <td>{{ article.createdAt ? article.createdAt|date('Y-m-d H:i:s') : '' }}</td>
-            </tr>
-        </tbody>
-    </table>
+    <!-- En-tête de l'article -->
+    <header class="article-header">
+        <h1 class="article-title" itemprop="headline">{{ article.title }}</h1>
+        
+        <div class="article-meta">
+            <time class="article-date" 
+                  datetime="{{ article.publishedAt|date('c') }}" 
+                  itemprop="datePublished">
+                Publié le {{ article.publishedAt|date('d/m/Y à H:i') }}
+            </time>
+            
+            {% if article.createdAt != article.publishedAt %}
+                <time class="article-updated" 
+                      datetime="{{ article.createdAt|date('c') }}" 
+                      itemprop="dateModified">
+                    Mis à jour le {{ article.createdAt|date('d/m/Y à H:i') }}
+                </time>
+            {% endif %}
+            
+            <span class="article-author" itemprop="author" itemscope itemtype="https://schema.org/Organization">
+                <span itemprop="name">Medianimal</span>
+            </span>
+        </div>
+    </header>
 
-    <a href="{{ path('app_article_index') }}">back to list</a>
+    <!-- Image principale -->
+    {% if article.imageMainPath %}
+        <figure class="article-image-container" itemprop="image" itemscope itemtype="https://schema.org/ImageObject">
+            <img src="{{ asset('images/articles/' ~ article.imageMainPath) }}" 
+                 alt="{{ article.title }}" 
+                 class="article-image"
+                 itemprop="url">
+            <meta itemprop="width" content="800">
+            <meta itemprop="height" content="600">
+        </figure>
+    {% endif %}
 
-    <a href="{{ path('app_article_edit', {'id': article.id}) }}">edit</a>
+    <!-- Contenu de l'article -->
+    <div class="article-content" id="article-body" itemprop="articleBody">
+        {{ article.content|raw }}
+    </div>
 
-    {{ include('article/_delete_form.html.twig') }}
+    <!-- Footer de l'article -->
+    <footer class="article-footer">
+        <div class="article-tags">
+            <span class="tag-label">Catégorie :</span>
+            <span class="tag" itemprop="articleSection">Bien-être animal</span>
+        </div>
+        
+        <div class="article-share">
+            <span class="share-label">Partager :</span>
+            <a href="https://twitter.com/intent/tweet?text={{ article.title|url_encode }}&url={{ app.request.uri|url_encode }}" 
+               target="_blank" 
+               rel="noopener" 
+               class="share-btn twitter"
+               aria-label="Partager sur Twitter">
+                🐦 Twitter
+            </a>
+            <a href="https://www.facebook.com/sharer/sharer.php?u={{ app.request.uri|url_encode }}" 
+               target="_blank" 
+               rel="noopener" 
+               class="share-btn facebook"
+               aria-label="Partager sur Facebook">
+                📘 Facebook
+            </a>
+        </div>
+    </footer>
+
+    <!-- Navigation vers d'autres articles -->
+    <nav class="article-navigation">
+        <a href="{{ path('app_blog') }}" class="back-to-blog">
+            ← Retour au blog
+        </a>
+    </nav>
+
+    <!-- Métadonnées cachées pour les moteurs de recherche -->
+    <div style="display: none;">
+        <span itemprop="publisher" itemscope itemtype="https://schema.org/Organization">
+            <span itemprop="name">Medianimal</span>
+            <span itemprop="logo" itemscope itemtype="https://schema.org/ImageObject">
+                <span itemprop="url">{{ absolute_url(asset('images/logo.png')) }}</span>
+            </span>
+        </span>
+        <span itemprop="mainEntityOfPage" itemscope itemtype="https://schema.org/WebPage">
+            <span itemprop="@id">{{ app.request.uri }}</span>
+        </span>
+    </div>
+</article>
 {% endblock %}

@@ -1,0 +1,95 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Blog - Medianimal{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('styles/blog.css') }}">
+{% endblock %}
+
+{% block body %}
+<div class="blog-container">
+    <header class="blog-header">
+        <h1 class="blog-title">Blog Medianimal</h1>
+        <p class="blog-subtitle">Découvrez nos derniers articles sur le bien-être animal</p>
+        {% if totalArticles > 0 %}
+            <p class="articles-info">{{ totalArticles }} article{{ totalArticles > 1 ? 's' : '' }} au total</p>
+        {% endif %}
+    </header>
+
+    {% if articles|length > 0 %}
+        <main class="articles-grid">
+            {% for article in articles %}
+                <article class="article-card" onclick="window.location.href='{{ path('app_article_show', {id: article.id}) }}'">
+                    {% if article.imageMainPath %}
+                        <img src="{{ asset('images/articles/' ~ article.imageMainPath) }}" 
+                             alt="{{ article.title }}" 
+                             class="article-image">
+                    {% else %}
+                        <div class="article-image" style="display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-size: 1.2rem;">
+                            📖 Article
+                        </div>
+                    {% endif %}
+                    
+                    <div class="article-content">
+                        <time class="article-date" datetime="{{ article.publishedAt|date('Y-m-d') }}">
+                            {{ article.publishedAt|date('d/m/Y') }}
+                        </time>
+                        
+                        <h2 class="article-title-card">{{ article.title }}</h2>
+                        
+                        <p class="article-excerpt">
+                            {{ article.content|striptags|slice(0, 150) }}{% if article.content|length > 150 %}...{% endif %}
+                        </p>
+                        
+                        <a href="{{ path('app_article_show', {id: article.id}) }}" class="read-more">
+                            Lire la suite →
+                        </a>
+                    </div>
+                </article>
+            {% endfor %}
+        </main>
+
+        {% if totalPages > 1 %}
+            <nav class="pagination">
+                {% if currentPage > 1 %}
+                    <a href="{{ path('app_blog', {page: currentPage - 1}) }}" class="pagination-btn">
+                        ← Précédent
+                    </a>
+                {% else %}
+                    <span class="pagination-btn disabled">← Précédent</span>
+                {% endif %}
+
+                {% for page in 1..totalPages %}
+                    {% if page == currentPage %}
+                        <span class="pagination-btn active">{{ page }}</span>
+                    {% elseif page == 1 or page == totalPages or (page >= currentPage - 2 and page <= currentPage + 2) %}
+                        <a href="{{ path('app_blog', {page: page}) }}" class="pagination-btn">{{ page }}</a>
+                    {% elseif page == currentPage - 3 or page == currentPage + 3 %}
+                        <span class="pagination-btn disabled">...</span>
+                    {% endif %}
+                {% endfor %}
+
+                {% if currentPage < totalPages %}
+                    <a href="{{ path('app_blog', {page: currentPage + 1}) }}" class="pagination-btn">
+                        Suivant →
+                    </a>
+                {% else %}
+                    <span class="pagination-btn disabled">Suivant →</span>
+                {% endif %}
+            </nav>
+
+            <div class="pagination-info">
+                Page {{ currentPage }} sur {{ totalPages }} 
+                ({{ (currentPage - 1) * 6 + 1 }} à {{ currentPage * 6 > totalArticles ? totalArticles : currentPage * 6 }} 
+                sur {{ totalArticles }} articles)
+            </div>
+        {% endif %}
+    {% else %}
+        <div class="no-articles">
+            <div class="no-articles-icon">📝</div>
+            <h2>Aucun article publié</h2>
+            <p>Les articles apparaîtront ici une fois publiés.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %} 
