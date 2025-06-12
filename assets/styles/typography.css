@@ -1,0 +1,81 @@
+/* ========================================
+   TYPOGRAPHIE GLOBALE - POPPINS
+======================================== */
+
+/* Configuration globale */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 1.6;
+    color: #333;
+    margin: 0;
+    padding: 0;
+}
+
+/* Titres principaux */
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    margin: 0 0 1rem 0;
+    line-height: 1.3;
+}
+
+h1 {
+    font-size: 18px;
+}
+
+h2 {
+    font-size: 16px;
+}
+
+h3 {
+    font-size: 14px;
+}
+
+h4, h5, h6 {
+    font-size: 12px;
+}
+
+/* Textes normaux */
+p, span, div, li, a {
+    font-family: 'Poppins', sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+}
+
+/* Liens */
+a {
+    color: #333;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+a:hover {
+    color: #007bff;
+}
+
+/* Classes utilitaires pour la typographie */
+.text-bold {
+    font-weight: 700;
+}
+
+.text-normal {
+    font-weight: 400;
+}
+
+.text-small {
+    font-size: 10px;
+}
+
+.text-large {
+    font-size: 14px;
+}
+
+.text-xl {
+    font-size: 18px;
+} 
