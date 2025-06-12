@@ -1,0 +1,214 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Réserver un rendez-vous - Medianimal{% endblock %}
+
+{% block stylesheets %}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .hero-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 3rem 0;
+        }
+        .form-container {
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            border-radius: 10px;
+            padding: 2rem;
+            margin: 2rem 0;
+            background: white;
+        }
+        .creneau-info {
+            background: #e7f3ff;
+            border: 1px solid #b3d9ff;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            padding: 12px 30px;
+        }
+        .btn-primary:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <!-- Section Hero -->
+    <div class="hero-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 mx-auto text-center">
+                    <h1 class="display-5 fw-bold mb-4">
+                        <i class="fas fa-calendar-plus me-3"></i>
+                        Réserver votre rendez-vous
+                    </h1>
+                    <p class="lead">
+                        Remplissez le formulaire ci-dessous pour confirmer votre réservation.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container my-5">
+        <!-- Messages flash -->
+        {% for label, messages in app.flashes %}
+            {% for message in messages %}
+                <div class="alert alert-{{ label == 'error' ? 'danger' : label }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endfor %}
+
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <!-- Informations du créneau sélectionné -->
+                <div class="creneau-info">
+                    <h4 class="mb-3">
+                        <i class="fas fa-clock me-2 text-primary"></i>
+                        Créneau sélectionné
+                    </h4>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong><i class="fas fa-calendar me-2"></i>Date :</strong> 
+                                {{ creneau.dateDebut|date('d/m/Y') }}
+                            </p>
+                            <p><strong><i class="fas fa-clock me-2"></i>Horaire :</strong> 
+                                {{ creneau.dateDebut|date('H:i') }} - {{ creneau.dateFin|date('H:i') }}
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            {% if creneau.titre %}
+                                <p><strong><i class="fas fa-tag me-2"></i>Type :</strong> 
+                                    {{ creneau.titre }}
+                                </p>
+                            {% endif %}
+                            {% if creneau.description %}
+                                <p><strong><i class="fas fa-info-circle me-2"></i>Description :</strong> 
+                                    {{ creneau.description }}
+                                </p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Formulaire de réservation -->
+                <div class="form-container">
+                    <h3 class="mb-4">
+                        <i class="fas fa-user me-2 text-primary"></i>
+                        Vos informations
+                    </h3>
+                    
+                    {{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form_label(form.prenom, null, {'label_attr': {'class': 'form-label fw-bold'}}) }}
+                            {{ form_widget(form.prenom, {'attr': {'class': 'form-control', 'required': 'required'}}) }}
+                            <div class="invalid-feedback">
+                                Veuillez saisir votre prénom.
+                            </div>
+                            {{ form_errors(form.prenom) }}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            {{ form_label(form.nom, null, {'label_attr': {'class': 'form-label fw-bold'}}) }}
+                            {{ form_widget(form.nom, {'attr': {'class': 'form-control', 'required': 'required'}}) }}
+                            <div class="invalid-feedback">
+                                Veuillez saisir votre nom.
+                            </div>
+                            {{ form_errors(form.nom) }}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form_label(form.email, null, {'label_attr': {'class': 'form-label fw-bold'}}) }}
+                            {{ form_widget(form.email, {'attr': {'class': 'form-control', 'required': 'required'}}) }}
+                            <div class="invalid-feedback">
+                                Veuillez saisir une adresse email valide.
+                            </div>
+                            {{ form_errors(form.email) }}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            {{ form_label(form.telephone, null, {'label_attr': {'class': 'form-label fw-bold'}}) }}
+                            {{ form_widget(form.telephone, {'attr': {'class': 'form-control', 'required': 'required'}}) }}
+                            <div class="invalid-feedback">
+                                Veuillez saisir votre numéro de téléphone.
+                            </div>
+                            {{ form_errors(form.telephone) }}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        {{ form_label(form.message, null, {'label_attr': {'class': 'form-label fw-bold'}}) }}
+                        {{ form_widget(form.message, {'attr': {'class': 'form-control'}}) }}
+                        <div class="form-text">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Décrivez brièvement le motif de votre visite (optionnel).
+                        </div>
+                        {{ form_errors(form.message) }}
+                    </div>
+
+                    <!-- Informations légales -->
+                    <div class="alert alert-info mb-4">
+                        <h6><i class="fas fa-shield-alt me-2"></i>Protection des données</h6>
+                        <small>
+                            Vos données personnelles sont collectées uniquement dans le cadre de la prise de rendez-vous
+                            et ne seront pas transmises à des tiers. Vous disposez d'un droit d'accès, de rectification
+                            et de suppression de vos données.
+                        </small>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ path('app_rendez_vous') }}" class="btn btn-outline-secondary me-md-2">
+                            <i class="fas fa-arrow-left me-2"></i>
+                            Retour au calendrier
+                        </a>
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-check me-2"></i>
+                            Confirmer la réservation
+                        </button>
+                    </div>
+                    
+                    {# Rendre les champs restants (notamment les champs cachés et tokens CSRF) #}
+                    {{ form_rest(form) }}
+                    {{ form_end(form, {'render_rest': false}) }}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Validation du formulaire Bootstrap
+        (function() {
+            'use strict';
+            window.addEventListener('load', function() {
+                var forms = document.getElementsByClassName('needs-validation');
+                var validation = Array.prototype.filter.call(forms, function(form) {
+                    form.addEventListener('submit', function(event) {
+                        if (form.checkValidity() === false) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                        }
+                        form.classList.add('was-validated');
+                    }, false);
+                });
+            }, false);
+        })();
+    </script>
+{% endblock %} 

@@ -1,0 +1,290 @@
+{% extends '@EasyAdmin/page/content.html.twig' %}
+
+{% block content_title %}
+    <i class="fas fa-tachometer-alt"></i> Tableau de bord
+{% endblock %}
+
+{% block main %}
+    <div class="row">
+        <!-- Statistiques des rendez-vous -->
+        <div class="col-md-3 mb-4">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h5 class="card-title">En attente</h5>
+                            <h2 class="mb-0">{{ stats.en_attente }}</h2>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-clock fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-4">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h5 class="card-title">Confirmés</h5>
+                            <h2 class="mb-0">{{ stats.confirme }}</h2>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-check-circle fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-4">
+            <div class="card bg-danger text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h5 class="card-title">Annulés</h5>
+                            <h2 class="mb-0">{{ stats.annule }}</h2>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-times-circle fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-4">
+            <div class="card bg-secondary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h5 class="card-title">Terminés</h5>
+                            <h2 class="mb-0">{{ stats.termine }}</h2>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-check fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Prochains rendez-vous -->
+        <div class="col-lg-8 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-calendar-alt me-2"></i>
+                        Prochains rendez-vous
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if prochains_rdv is empty %}
+                        <p class="text-muted text-center py-4">
+                            <i class="fas fa-calendar-times fa-3x mb-3"></i><br>
+                            Aucun rendez-vous prévu
+                        </p>
+                    {% else %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Heure</th>
+                                        <th>Client</th>
+                                        <th>Contact</th>
+                                        <th>Statut</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for rdv in prochains_rdv %}
+                                        <tr>
+                                            <td>
+                                                <strong>{{ rdv.creneau.dateDebut|date('d/m/Y') }}</strong>
+                                            </td>
+                                            <td>
+                                                {{ rdv.creneau.dateDebut|date('H:i') }} - {{ rdv.creneau.dateFin|date('H:i') }}
+                                            </td>
+                                            <td>
+                                                <div>
+                                                    <strong>{{ rdv.nomComplet }}</strong>
+                                                    {% if rdv.message %}
+                                                        <br><small class="text-muted">{{ rdv.message|length > 50 ? rdv.message|slice(0, 50) ~ '...' : rdv.message }}</small>
+                                                    {% endif %}
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div>
+                                                    <i class="fas fa-envelope me-1"></i> {{ rdv.email }}<br>
+                                                    <i class="fas fa-phone me-1"></i> {{ rdv.telephone }}
+                                                </div>
+                                            </td>
+                                            <td>
+                                                {% set badge_class = rdv.statut == 'en_attente' ? 'warning' : (rdv.statut == 'confirme' ? 'success' : (rdv.statut == 'annule' ? 'danger' : 'secondary')) %}
+                                                <span class="badge bg-{{ badge_class }}">
+                                                    {{ rdv.statutLabel }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <a href="{{ ea_url().setController('App\\Controller\\Admin\\RendezVousCrudController').setAction('detail').setEntityId(rdv.id) }}" 
+                                                   class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="text-center mt-3">
+                            <a href="{{ ea_url().setController('App\\Controller\\Admin\\RendezVousCrudController').setAction('index') }}" 
+                               class="btn btn-primary">
+                                <i class="fas fa-list me-2"></i>
+                                Voir tous les rendez-vous
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions rapides -->
+        <div class="col-lg-4 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-bolt me-2"></i>
+                        Actions rapides
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{{ ea_url().setController('App\\Controller\\Admin\\CreneauCrudController').setAction('new') }}" 
+                           class="btn btn-success">
+                            <i class="fas fa-calendar-plus me-2"></i>
+                            Créer un nouveau créneau
+                        </a>
+                        
+                        <a href="{{ ea_url().setController('App\\Controller\\Admin\\CreneauCrudController').setAction('index') }}" 
+                           class="btn btn-outline-primary">
+                            <i class="fas fa-calendar-alt me-2"></i>
+                            Gérer les créneaux
+                        </a>
+                        
+                        <a href="{{ ea_url().setController('App\\Controller\\Admin\\RendezVousCrudController').setAction('index') }}" 
+                           class="btn btn-outline-secondary">
+                            <i class="fas fa-calendar-check me-2"></i>
+                            Voir les rendez-vous
+                        </a>
+                    </div>
+
+                    <hr>
+
+                    <h6 class="mb-3">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Informations
+                    </h6>
+                    <ul class="list-unstyled small">
+                        <li class="mb-2">
+                            <i class="fas fa-lightbulb me-2 text-warning"></i>
+                            Les créneaux en <span class="badge bg-warning">attente</span> nécessitent une confirmation
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-phone me-2 text-success"></i>
+                            Contactez les clients pour confirmer les rendez-vous
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-calendar me-2 text-info"></i>
+                            Pensez à créer vos créneaux à l'avance
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Résumé général -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-chart-pie me-2"></i>
+                        Résumé général
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% set total = stats.en_attente + stats.confirme + stats.annule + stats.termine %}
+                    <p class="mb-3">
+                        Total des rendez-vous : <strong>{{ total }}</strong>
+                    </p>
+                    
+                    {% if total > 0 %}
+                        <div class="progress mb-3" style="height: 20px;">
+                            {% if stats.en_attente > 0 %}
+                                <div class="progress-bar bg-warning" role="progressbar" 
+                                     style="width: {{ (stats.en_attente / total * 100)|round(1) }}%"
+                                     title="En attente: {{ stats.en_attente }}">
+                                    {{ stats.en_attente > 0 ? stats.en_attente : '' }}
+                                </div>
+                            {% endif %}
+                            {% if stats.confirme > 0 %}
+                                <div class="progress-bar bg-success" role="progressbar" 
+                                     style="width: {{ (stats.confirme / total * 100)|round(1) }}%"
+                                     title="Confirmés: {{ stats.confirme }}">
+                                    {{ stats.confirme > 0 ? stats.confirme : '' }}
+                                </div>
+                            {% endif %}
+                            {% if stats.annule > 0 %}
+                                <div class="progress-bar bg-danger" role="progressbar" 
+                                     style="width: {{ (stats.annule / total * 100)|round(1) }}%"
+                                     title="Annulés: {{ stats.annule }}">
+                                    {{ stats.annule > 0 ? stats.annule : '' }}
+                                </div>
+                            {% endif %}
+                            {% if stats.termine > 0 %}
+                                <div class="progress-bar bg-secondary" role="progressbar" 
+                                     style="width: {{ (stats.termine / total * 100)|round(1) }}%"
+                                     title="Terminés: {{ stats.termine }}">
+                                    {{ stats.termine > 0 ? stats.termine : '' }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="row text-center">
+                            <div class="col-3">
+                                <small class="text-warning">
+                                    <i class="fas fa-square me-1"></i>
+                                    En attente ({{ (stats.en_attente / total * 100)|round(1) }}%)
+                                </small>
+                            </div>
+                            <div class="col-3">
+                                <small class="text-success">
+                                    <i class="fas fa-square me-1"></i>
+                                    Confirmés ({{ (stats.confirme / total * 100)|round(1) }}%)
+                                </small>
+                            </div>
+                            <div class="col-3">
+                                <small class="text-danger">
+                                    <i class="fas fa-square me-1"></i>
+                                    Annulés ({{ (stats.annule / total * 100)|round(1) }}%)
+                                </small>
+                            </div>
+                            <div class="col-3">
+                                <small class="text-secondary">
+                                    <i class="fas fa-square me-1"></i>
+                                    Terminés ({{ (stats.termine / total * 100)|round(1) }}%)
+                                </small>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %} 

@@ -8,20 +8,30 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use App\Controller\Admin\ArticleCrudController;
+use App\Entity\Article;
+use App\Entity\Creneau;
+use App\Entity\RendezVous;
+use App\Repository\RendezVousRepository;
 use Symfony\Component\HttpFoundation\Response;
 
 #[AdminDashboard(routePath: '/admin', routeName: 'admin')]
 class DashboardController extends AbstractDashboardController
 {
+    public function __construct(
+        private RendezVousRepository $rendezVousRepository
+    ) {
+    }
+
     public function index(): Response
     {
-        $adminUrlGenerator = $this->container->get(AdminUrlGenerator::class);
+        // Afficher un dashboard avec les statistiques des rendez-vous
+        $stats = $this->rendezVousRepository->countByStatut();
+        $prochains = $this->rendezVousRepository->findRendezVousAVenir();
 
-        $url = $adminUrlGenerator
-            ->setController(ArticleCrudController::class)
-            ->generateUrl();
-
-        return $this->redirect($url);
+        return $this->render('admin/dashboard.html.twig', [
+            'stats' => $stats,
+            'prochains_rdv' => array_slice($prochains, 0, 5), // Les 5 prochains
+        ]);
 
         // Option 1. You can make your dashboard redirect to some common page of your backend
         //
@@ -47,12 +57,20 @@ class DashboardController extends AbstractDashboardController
     public function configureDashboard(): Dashboard
     {
         return Dashboard::new()
-            ->setTitle('Medianimal Blog');
+            ->setTitle('Medianimal Blog - Administration');
     }
 
     public function configureMenuItems(): iterable
     {
-        yield MenuItem::linkToDashboard('Dashboard', 'fa fa-home');
-        yield MenuItem::linkToCrud('Articles', 'fas fa-newspaper', \App\Entity\Article::class);
+        yield MenuItem::linkToDashboard('Tableau de bord', 'fa fa-home');
+        
+        yield MenuItem::section('Contenu');
+        yield MenuItem::linkToCrud('Articles', 'fas fa-newspaper', Article::class);
+        
+        yield MenuItem::section('Rendez-vous');
+        yield MenuItem::linkToCrud('Créneaux', 'fas fa-calendar-plus', Creneau::class)
+            ->setPermission('ROLE_ADMIN');
+        yield MenuItem::linkToCrud('Rendez-vous', 'fas fa-calendar-check', RendezVous::class)
+            ->setPermission('ROLE_ADMIN');
     }
 }

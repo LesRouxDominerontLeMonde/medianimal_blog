@@ -1,0 +1,248 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Prendre rendez-vous - Medianimal{% endblock %}
+
+{% block stylesheets %}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.8/main.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@fullcalendar/daygrid@6.1.8/main.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@fullcalendar/timegrid@6.1.8/main.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .fc-event {
+            cursor: pointer;
+        }
+        .fc-event:hover {
+            opacity: 0.8;
+        }
+        .hero-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 4rem 0;
+        }
+        .calendar-container {
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .available-slot {
+            background-color: #28a745 !important;
+            border-color: #28a745 !important;
+        }
+        .unavailable-slot {
+            background-color: #dc3545 !important;
+            border-color: #dc3545 !important;
+        }
+        .info-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <!-- Section Hero -->
+    <div class="hero-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 mx-auto text-center">
+                    <h1 class="display-4 fw-bold mb-4">
+                        <i class="fas fa-calendar-check me-3"></i>
+                        Prendre rendez-vous
+                    </h1>
+                    <p class="lead mb-4">
+                        Choisissez un créneau disponible dans notre calendrier et réservez votre rendez-vous en quelques clics.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container my-5">
+        <!-- Messages flash -->
+        {% for label, messages in app.flashes %}
+            {% for message in messages %}
+                <div class="alert alert-{{ label == 'error' ? 'danger' : label }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endfor %}
+
+        <div class="row">
+            <div class="col-lg-8">
+                <!-- Calendrier -->
+                <div class="calendar-container bg-white">
+                    <h3 class="mb-4">
+                        <i class="fas fa-calendar-alt me-2 text-primary"></i>
+                        Créneaux disponibles
+                    </h3>
+                    <div id="calendar"></div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <!-- Informations -->
+                <div class="info-card">
+                    <h4 class="mb-3">
+                        <i class="fas fa-info-circle me-2 text-info"></i>
+                        Informations pratiques
+                    </h4>
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <i class="fas fa-clock me-2 text-primary"></i>
+                            <strong>Durée :</strong> Environ 30 minutes
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-map-marker-alt me-2 text-primary"></i>
+                            <strong>Lieu :</strong> Cabinet vétérinaire
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-phone me-2 text-primary"></i>
+                            <strong>Contact :</strong> 01 23 45 67 89
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-envelope me-2 text-primary"></i>
+                            <strong>Email :</strong> contact@medianimal.fr
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Légende -->
+                <div class="info-card">
+                    <h5 class="mb-3">
+                        <i class="fas fa-question-circle me-2 text-warning"></i>
+                        Légende
+                    </h5>
+                    <div class="d-flex align-items-center mb-2">
+                        <div class="bg-success rounded me-2" style="width: 20px; height: 20px;"></div>
+                        <span>Créneaux disponibles</span>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <div class="bg-danger rounded me-2" style="width: 20px; height: 20px;"></div>
+                        <span>Créneaux occupés</span>
+                    </div>
+                </div>
+
+                <!-- Instructions -->
+                <div class="info-card">
+                    <h5 class="mb-3">
+                        <i class="fas fa-hand-point-up me-2 text-primary"></i>
+                        Comment procéder ?
+                    </h5>
+                    <ol class="ps-3">
+                        <li class="mb-2">Cliquez sur un créneau disponible (vert)</li>
+                        <li class="mb-2">Remplissez le formulaire de réservation</li>
+                        <li class="mb-2">Validez votre demande</li>
+                        <li>Vous recevrez une confirmation</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal pour les détails du créneau -->
+    <div class="modal fade" id="creneauModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Détails du créneau</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="creneauDetails">
+                        <!-- Contenu dynamique -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                    <a href="#" id="btnReserver" class="btn btn-primary">
+                        <i class="fas fa-calendar-plus me-2"></i>
+                        Réserver ce créneau
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.8/index.global.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/daygrid@6.1.8/index.global.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/timegrid@6.1.8/index.global.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/interaction@6.1.8/index.global.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.8/locales/fr.global.min.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const calendarEl = document.getElementById('calendar');
+            const modal = new bootstrap.Modal(document.getElementById('creneauModal'));
+            
+            const calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'timeGridWeek',
+                locale: 'fr',
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                },
+                height: 'auto',
+                slotMinTime: '08:00:00',
+                slotMaxTime: '19:00:00',
+                businessHours: {
+                    daysOfWeek: [1, 2, 3, 4, 5], // Lundi à vendredi
+                    startTime: '08:00',
+                    endTime: '18:00'
+                },
+                events: {
+                    url: '{{ path('app_rdv_api_creneaux') }}',
+                    failure: function() {
+                        alert('Erreur lors du chargement des créneaux');
+                    }
+                },
+                eventClick: function(info) {
+                    if (info.event.extendedProps.disponible) {
+                        // Afficher les détails du créneau disponible
+                        fetch(`{{ path('app_rdv_api_creneau_details', {id: 'CRENEAU_ID'}) }}`.replace('CRENEAU_ID', info.event.id))
+                            .then(response => response.json())
+                            .then(data => {
+                                document.getElementById('creneauDetails').innerHTML = `
+                                    <p><strong>Date :</strong> ${data.dateDebut}</p>
+                                    <p><strong>Durée :</strong> ${data.dateDebut} - ${data.dateFin}</p>
+                                    ${data.titre ? `<p><strong>Type :</strong> ${data.titre}</p>` : ''}
+                                    ${data.description ? `<p><strong>Description :</strong> ${data.description}</p>` : ''}
+                                    <div class="alert alert-success">
+                                        <i class="fas fa-check-circle me-2"></i>
+                                        Ce créneau est disponible !
+                                    </div>
+                                `;
+                                document.getElementById('btnReserver').href = `{{ path('app_rdv_reserver', {id: 'CRENEAU_ID'}) }}`.replace('CRENEAU_ID', info.event.id);
+                                modal.show();
+                            })
+                            .catch(error => {
+                                console.error('Erreur:', error);
+                                alert('Erreur lors du chargement des détails');
+                            });
+                    } else {
+                        // Créneau non disponible
+                        document.getElementById('creneauDetails').innerHTML = `
+                            <div class="alert alert-danger">
+                                <i class="fas fa-times-circle me-2"></i>
+                                Ce créneau n'est plus disponible.
+                            </div>
+                        `;
+                        document.getElementById('btnReserver').style.display = 'none';
+                        modal.show();
+                    }
+                }
+            });
+            
+            calendar.render();
+        });
+    </script>
+{% endblock %} 

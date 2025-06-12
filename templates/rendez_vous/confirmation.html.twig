@@ -1,0 +1,191 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Confirmation de rendez-vous - Medianimal{% endblock %}
+
+{% block stylesheets %}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .hero-section {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            padding: 4rem 0;
+        }
+        .confirmation-card {
+            box-shadow: 0 0 30px rgba(0,0,0,0.1);
+            border-radius: 15px;
+            padding: 3rem;
+            margin: 2rem 0;
+            background: white;
+            border-top: 5px solid #28a745;
+        }
+        .info-box {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border-left: 4px solid #28a745;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            padding: 12px 30px;
+        }
+        .success-icon {
+            font-size: 4rem;
+            color: #28a745;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <!-- Section Hero -->
+    <div class="hero-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 mx-auto text-center">
+                    <div class="success-icon mb-4">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <h1 class="display-4 fw-bold mb-4">
+                        Rendez-vous confirmé !
+                    </h1>
+                    <p class="lead">
+                        Votre demande de rendez-vous a été enregistrée avec succès.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container my-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="confirmation-card">
+                    <div class="text-center mb-4">
+                        <h2 class="text-success">
+                            <i class="fas fa-calendar-check me-2"></i>
+                            Récapitulatif de votre rendez-vous
+                        </h2>
+                        <p class="text-muted">Numéro de référence : <strong>#{{ rendezVous.id }}</strong></p>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="info-box">
+                                <h5 class="mb-3">
+                                    <i class="fas fa-calendar me-2 text-primary"></i>
+                                    Informations du rendez-vous
+                                </h5>
+                                <p><strong>Date :</strong> {{ rendezVous.creneau.dateDebut|date('d/m/Y') }}</p>
+                                <p><strong>Heure :</strong> {{ rendezVous.creneau.dateDebut|date('H:i') }} - {{ rendezVous.creneau.dateFin|date('H:i') }}</p>
+                                {% if rendezVous.creneau.titre %}
+                                    <p><strong>Type :</strong> {{ rendezVous.creneau.titre }}</p>
+                                {% endif %}
+                                <p><strong>Statut :</strong> 
+                                    <span class="badge bg-warning">{{ rendezVous.statutLabel }}</span>
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="info-box">
+                                <h5 class="mb-3">
+                                    <i class="fas fa-user me-2 text-primary"></i>
+                                    Vos informations
+                                </h5>
+                                <p><strong>Nom :</strong> {{ rendezVous.nomComplet }}</p>
+                                <p><strong>Email :</strong> {{ rendezVous.email }}</p>
+                                <p><strong>Téléphone :</strong> {{ rendezVous.telephone }}</p>
+                                <p><strong>Demandé le :</strong> {{ rendezVous.createdAt|date('d/m/Y à H:i') }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if rendezVous.message %}
+                        <div class="info-box mt-3">
+                            <h5 class="mb-3">
+                                <i class="fas fa-comment me-2 text-primary"></i>
+                                Votre message
+                            </h5>
+                            <p class="mb-0">{{ rendezVous.message }}</p>
+                        </div>
+                    {% endif %}
+
+                    <!-- Prochaines étapes -->
+                    <div class="alert alert-info mt-4">
+                        <h5 class="alert-heading">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Prochaines étapes
+                        </h5>
+                        <ul class="mb-0">
+                            <li>Vous recevrez un email de confirmation à l'adresse : <strong>{{ rendezVous.email }}</strong></li>
+                            <li>Nous vous contacterons au <strong>{{ rendezVous.telephone }}</strong> pour confirmer votre rendez-vous</li>
+                            <li>En cas d'empêchement, contactez-nous au <strong>01 23 45 67 89</strong></li>
+                        </ul>
+                    </div>
+
+                    <!-- Instructions préparatoires -->
+                    <div class="alert alert-light mt-3">
+                        <h6 class="fw-bold">
+                            <i class="fas fa-clipboard-list me-2"></i>
+                            Pour préparer votre visite
+                        </h6>
+                        <ul class="mb-0 small">
+                            <li>Apportez le carnet de santé de votre animal</li>
+                            <li>Préparez la liste des questions que vous souhaitez poser</li>
+                            <li>Munissez-vous d'une pièce d'identité</li>
+                            <li>Arrivez 10 minutes en avance</li>
+                        </ul>
+                    </div>
+
+                    <div class="text-center mt-4">
+                        <a href="{{ path('app_rendez_vous') }}" class="btn btn-outline-primary me-3">
+                            <i class="fas fa-calendar-plus me-2"></i>
+                            Prendre un autre rendez-vous
+                        </a>
+                        <a href="/" class="btn btn-primary">
+                            <i class="fas fa-home me-2"></i>
+                            Retour à l'accueil
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Informations de contact -->
+                <div class="row mt-4">
+                    <div class="col-md-4">
+                        <div class="text-center p-3 border rounded">
+                            <i class="fas fa-phone-alt fa-2x text-primary mb-2"></i>
+                            <h6>Téléphone</h6>
+                            <p class="mb-0">01 23 45 67 89</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="text-center p-3 border rounded">
+                            <i class="fas fa-envelope fa-2x text-primary mb-2"></i>
+                            <h6>Email</h6>
+                            <p class="mb-0">contact@medianimal.fr</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="text-center p-3 border rounded">
+                            <i class="fas fa-map-marker-alt fa-2x text-primary mb-2"></i>
+                            <h6>Adresse</h6>
+                            <p class="mb-0">123 Rue de la Santé<br>75000 Paris</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+{% endblock %} 

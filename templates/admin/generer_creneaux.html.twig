@@ -1,0 +1,254 @@
+{% extends '@EasyAdmin/page/content.html.twig' %}
+
+{% block content_title %}
+    <i class="fas fa-magic"></i> Générer des créneaux
+{% endblock %}
+
+{% block main %}
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-calendar-plus me-2"></i>
+                        Configuration de la journée type
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {{ form_start(form, {'attr': {'id': 'generation-form'}}) }}
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ form_row(form.titre_defaut) }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form_row(form.nombre_semaines) }}
+                        </div>
+                    </div>
+                    
+                    {{ form_row(form.description_defaut) }}
+                    
+                    <hr>
+                    
+                    <h6><i class="fas fa-clock me-2"></i>Horaires de la journée type</h6>
+                    <div id="horaires-container" class="mb-3">
+                        {# Toujours rendre les champs de la collection via Symfony #}
+                        {% for horaire in form.horaires %}
+                            <div class="row mb-2 horaire-row" data-index="{{ loop.index0 }}">
+                                <div class="col-md-4">
+                                    {{ form_widget(horaire.heure_debut, {'attr': {'class': 'form-control'}}) }}
+                                </div>
+                                <div class="col-md-4">
+                                    {{ form_widget(horaire.heure_fin, {'attr': {'class': 'form-control'}}) }}
+                                </div>
+                                <div class="col-md-4">
+                                    <button type="button" class="btn btn-danger btn-sm remove-horaire" 
+                                            {% if loop.first and loop.last %}disabled title="Vous devez garder au moins un horaire"{% endif %}>
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <button type="button" id="add-horaire" class="btn btn-secondary btn-sm mb-3">
+                        <i class="fas fa-plus me-2"></i>Ajouter un horaire
+                    </button>
+                    
+                    <hr>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6><i class="fas fa-calendar-week me-2"></i>Jours de la semaine</h6>
+                            {{ form_widget(form.jours_semaine) }}
+                        </div>
+                        <div class="col-md-6">
+                            <h6><i class="fas fa-calendar-alt me-2"></i>Période</h6>
+                            {{ form_row(form.date_debut) }}
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <h6><i class="fas fa-cog me-2"></i>Options avancées</h6>
+                    {{ form_row(form.ecraser_existants) }}
+                    
+                    <div class="d-flex gap-2 mt-4">
+                        <button type="submit" name="preview" class="btn btn-info">
+                            <i class="fas fa-eye me-2"></i>
+                            Prévisualiser
+                        </button>
+                        <button type="submit" class="btn btn-success" onclick="return confirm('Êtes-vous sûr de vouloir générer ces créneaux ?')">
+                            <i class="fas fa-check me-2"></i>
+                            Générer les créneaux
+                        </button>
+                        <a href="{{ ea_url().setController('App\\Controller\\Admin\\CreneauCrudController').setAction('index') }}" 
+                           class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>
+                            Retour
+                        </a>
+                    </div>
+                    
+                    {# Rendre les champs restants (notamment les champs cachés et tokens) #}
+                    {{ form_rest(form) }}
+                    {{ form_end(form, {'render_rest': false}) }}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Aide
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <h6>Comment utiliser cet outil ?</h6>
+                    <ol class="small">
+                        <li><strong>Définissez votre journée type</strong> : Configurez le titre, la description et les horaires</li>
+                        <li><strong>Choisissez les jours</strong> : Sélectionnez les jours de la semaine concernés</li>
+                        <li><strong>Définissez la période</strong> : Date de début et nombre de semaines</li>
+                        <li><strong>Prévisualisez</strong> : Vérifiez le résultat avant la génération</li>
+                        <li><strong>Générez</strong> : Créez tous les créneaux en une fois</li>
+                    </ol>
+                    
+                    <hr>
+                    
+                    <h6>Conseils</h6>
+                    <ul class="small">
+                        <li>Utilisez des horaires de 30 minutes par défaut</li>
+                        <li>Évitez les chevauchements d'horaires</li>
+                        <li>Vous pourrez modifier individuellement chaque créneau après génération</li>
+                        <li>L'option "Écraser" supprime les créneaux existants aux mêmes horaires</li>
+                    </ul>
+                </div>
+            </div>
+            
+            {% if preview %}
+                <div class="card mt-3">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-eye me-2"></i>
+                            Prévisualisation
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>{{ preview|length }} créneaux seront créés :</strong></p>
+                        
+                        {% if preview|length > 20 %}
+                            <p class="text-muted">Affichage des 20 premiers créneaux...</p>
+                        {% endif %}
+                        
+                        <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Jour</th>
+                                        <th>Horaire</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for creneau in preview|slice(0, 20) %}
+                                        <tr>
+                                            <td>{{ creneau.date }}</td>
+                                            <td>{{ creneau.jour }}</td>
+                                            <td>{{ creneau.heure_debut }} - {{ creneau.heure_fin }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        {% if preview|length > 20 %}
+                            <p class="text-muted small">... et {{ preview|length - 20 }} autres créneaux</p>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const container = document.getElementById('horaires-container');
+            const addButton = document.getElementById('add-horaire');
+            let horaireIndex = {{ form.horaires ? form.horaires|length : 0 }};
+
+            // Fonction pour mettre à jour l'état des boutons de suppression
+            function updateRemoveButtons() {
+                const rows = container.querySelectorAll('.horaire-row');
+                const removeButtons = container.querySelectorAll('.remove-horaire');
+                
+                removeButtons.forEach(button => {
+                    if (rows.length <= 1) {
+                        button.disabled = true;
+                        button.title = 'Vous devez garder au moins un horaire';
+                    } else {
+                        button.disabled = false;
+                        button.title = '';
+                    }
+                });
+            }
+
+            // Initialiser l'état des boutons
+            updateRemoveButtons();
+
+            // Ajouter un nouvel horaire
+            addButton.addEventListener('click', function() {
+                const template = `
+                    <div class="row mb-2 horaire-row" data-index="${horaireIndex}">
+                        <div class="col-md-4">
+                            <input type="time" name="generation_creneaux[horaires][${horaireIndex}][heure_debut]" class="form-control" value="09:00" required>
+                        </div>
+                        <div class="col-md-4">
+                            <input type="time" name="generation_creneaux[horaires][${horaireIndex}][heure_fin]" class="form-control" value="09:30" required>
+                        </div>
+                        <div class="col-md-4">
+                            <button type="button" class="btn btn-danger btn-sm remove-horaire">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                container.insertAdjacentHTML('beforeend', template);
+                horaireIndex++;
+                
+                // Réactiver tous les boutons de suppression s'il y a plus d'un horaire
+                updateRemoveButtons();
+            });
+
+            // Supprimer un horaire
+            container.addEventListener('click', function(e) {
+                if (e.target.closest('.remove-horaire')) {
+                    const row = e.target.closest('.horaire-row');
+                    const rows = container.querySelectorAll('.horaire-row');
+                    
+                    if (rows.length > 1) {
+                        row.remove();
+                        updateRemoveButtons();
+                    }
+                }
+            });
+
+            // Validation côté client pour éviter les heures de fin antérieures aux heures de début
+            container.addEventListener('change', function(e) {
+                if (e.target.type === 'time') {
+                    const row = e.target.closest('.horaire-row');
+                    const heureDebut = row.querySelector('input[name*="[heure_debut]"]').value;
+                    const heureFin = row.querySelector('input[name*="[heure_fin]"]').value;
+                    
+                    if (heureDebut && heureFin && heureFin <= heureDebut) {
+                        alert('L\'heure de fin doit être postérieure à l\'heure de début');
+                        e.target.focus();
+                    }
+                }
+            });
+        });
+    </script>
+{% endblock %} 
