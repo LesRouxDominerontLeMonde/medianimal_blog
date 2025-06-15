@@ -26,6 +26,10 @@ class GenerationCreneauxType extends AbstractType
                 'attr' => [
                     'class' => 'form-control',
                     'placeholder' => 'ex: Consultation, Urgence...'
+                ],
+                'constraints' => [
+                    new Assert\NotBlank(['message' => 'Le titre par défaut est obligatoire.']),
+                    new Assert\Length(['min' => 2, 'max' => 255])
                 ]
             ])
             ->add('description_defaut', TextareaType::class, [
@@ -47,6 +51,12 @@ class GenerationCreneauxType extends AbstractType
                 'by_reference' => false,
                 'attr' => [
                     'class' => 'horaires-collection'
+                ],
+                'constraints' => [
+                    new Assert\Count([
+                        'min' => 1,
+                        'minMessage' => 'Au moins {{ limit }} horaire est requis.'
+                    ])
                 ]
             ])
             
@@ -66,6 +76,12 @@ class GenerationCreneauxType extends AbstractType
                 'expanded' => true,
                 'attr' => [
                     'class' => 'form-check-list'
+                ],
+                'constraints' => [
+                    new Assert\Count([
+                        'min' => 1,
+                        'minMessage' => 'Vous devez sélectionner au moins {{ limit }} jour.'
+                    ])
                 ]
             ])
             
@@ -106,6 +122,9 @@ class GenerationCreneauxType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => null,
+            'csrf_protection' => true,
+            'csrf_field_name' => '_token',
+            'csrf_token_id' => 'generation_creneaux',
         ]);
     }
 }
@@ -118,12 +137,18 @@ class HoraireCreneauType extends AbstractType
             ->add('heure_debut', TimeType::class, [
                 'label' => 'Début',
                 'widget' => 'single_text',
-                'attr' => ['class' => 'form-control']
+                'attr' => ['class' => 'form-control'],
+                'constraints' => [
+                    new Assert\NotBlank(['message' => 'L\'heure de début est obligatoire.'])
+                ]
             ])
             ->add('heure_fin', TimeType::class, [
                 'label' => 'Fin',
                 'widget' => 'single_text',
-                'attr' => ['class' => 'form-control']
+                'attr' => ['class' => 'form-control'],
+                'constraints' => [
+                    new Assert\NotBlank(['message' => 'L\'heure de fin est obligatoire.'])
+                ]
             ])
         ;
     }

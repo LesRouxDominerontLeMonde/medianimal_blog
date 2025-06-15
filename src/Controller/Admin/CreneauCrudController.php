@@ -126,34 +126,45 @@ class CreneauCrudController extends AbstractCrudController
         $preview = null;
         $results = null;
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $data = $form->getData();
-            
-            if ($request->request->has('preview')) {
-                // Mode prévisualisation
-                $preview = $this->generateurCreneaux->previsualiserCreneaux($data);
-            } else {
-                // Génération effective
-                $results = $this->generateurCreneaux->genererCreneaux($data);
+        if ($form->isSubmitted()) {
+            if ($form->isValid()) {
+                $data = $form->getData();
                 
-                if (empty($results['erreurs'])) {
-                    $this->addFlash('success', sprintf(
-                        '%d créneaux créés avec succès%s !',
-                        $results['crees'],
-                        $results['supprimes'] > 0 ? ' (' . $results['supprimes'] . ' supprimés)' : ''
-                    ));
-                    
-                    // Rediriger vers la liste des créneaux
-                    $url = $this->adminUrlGenerator
-                        ->setController(self::class)
-                        ->setAction(Action::INDEX)
-                        ->generateUrl();
-                    
-                    return $this->redirect($url);
+                if ($request->request->has('preview')) {
+                    // Mode prévisualisation
+                    $preview = $this->generateurCreneaux->previsualiserCreneaux($data);
                 } else {
-                    foreach ($results['erreurs'] as $erreur) {
-                        $this->addFlash('error', $erreur);
+                    // Génération effective
+                    $results = $this->generateurCreneaux->genererCreneaux($data);
+                    
+                    if (empty($results['erreurs'])) {
+                        $this->addFlash('success', sprintf(
+                            '%d créneaux créés avec succès%s !',
+                            $results['crees'],
+                            $results['supprimes'] > 0 ? ' (' . $results['supprimes'] . ' supprimés)' : ''
+                        ));
+                        
+                        // Rediriger vers la liste des créneaux
+                        $url = $this->adminUrlGenerator
+                            ->setController(self::class)
+                            ->setAction(Action::INDEX)
+                            ->generateUrl();
+                        
+                        return $this->redirect($url);
+                    } else {
+                        foreach ($results['erreurs'] as $erreur) {
+                            $this->addFlash('danger', $erreur);
+                        }
                     }
+                }
+            } else {
+                // Formulaire soumis mais invalide - ajouter les erreurs comme flash messages
+                $this->addFlash('danger', 'Le formulaire contient des erreurs. Veuillez vérifier les champs.');
+                
+                // Log simple des erreurs
+                $errorCount = count($form->getErrors());
+                if ($errorCount > 0) {
+                    $this->addFlash('danger', "Nombre d'erreurs détectées : $errorCount");
                 }
             }
         }

@@ -15,6 +15,11 @@
                     </h5>
                 </div>
                 <div class="card-body">
+                    {# EasyAdmin gère automatiquement l'affichage des messages flash #}
+                    
+                    {# Affichage des erreurs générales du formulaire #}
+                    {{ form_errors(form) }}
+                    
                     {{ form_start(form, {'attr': {'id': 'generation-form'}}) }}
                     
                     <div class="row">
@@ -170,85 +175,84 @@
             {% endif %}
         </div>
     </div>
-{% endblock %}
-
-{% block javascripts %}
-    {{ parent() }}
+    
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const container = document.getElementById('horaires-container');
             const addButton = document.getElementById('add-horaire');
-            let horaireIndex = {{ form.horaires ? form.horaires|length : 0 }};
-
-            // Fonction pour mettre à jour l'état des boutons de suppression
-            function updateRemoveButtons() {
-                const rows = container.querySelectorAll('.horaire-row');
-                const removeButtons = container.querySelectorAll('.remove-horaire');
-                
-                removeButtons.forEach(button => {
-                    if (rows.length <= 1) {
-                        button.disabled = true;
-                        button.title = 'Vous devez garder au moins un horaire';
-                    } else {
-                        button.disabled = false;
-                        button.title = '';
-                    }
-                });
+            const form = document.getElementById('generation-form');
+            let index = {{ form.horaires|length|default(0) }};
+            
+            if (!container || !form) {
+                return;
             }
-
-            // Initialiser l'état des boutons
-            updateRemoveButtons();
-
-            // Ajouter un nouvel horaire
-            addButton.addEventListener('click', function() {
-                const template = `
-                    <div class="row mb-2 horaire-row" data-index="${horaireIndex}">
+            
+            // Récupérer le nom du formulaire dynamiquement
+            const formName = '{{ form.vars.name }}';
+            console.log('🔧 Debug: Nom du formulaire =', formName);
+            
+            // Vérifier la présence du token CSRF
+            const csrfToken = form.querySelector('input[name="' + formName + '[_token]"]');
+            console.log('🔧 Debug: Token CSRF présent =', csrfToken ? 'OUI' : 'NON');
+            if (csrfToken) {
+                console.log('🔧 Debug: Valeur du token =', csrfToken.value);
+            }
+            
+            // Fonction pour supprimer une ligne
+            function supprimerLigne(button) {
+                const ligne = button.closest('.horaire-row');
+                const toutesLignes = container.querySelectorAll('.horaire-row');
+                
+                // Supprimer seulement s'il y a plus d'une ligne
+                if (toutesLignes.length > 1) {
+                    ligne.remove();
+                }
+            }
+            
+            // Attacher les événements aux boutons existants
+            const boutonsExistants = container.querySelectorAll('.remove-horaire');
+            boutonsExistants.forEach(function(button) {
+                button.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    supprimerLigne(this);
+                });
+            });
+            
+            // Ajouter une nouvelle ligne
+            if (addButton) {
+                addButton.addEventListener('click', function() {
+                    const nouvelleLigne = document.createElement('div');
+                    nouvelleLigne.className = 'row mb-2 horaire-row';
+                    nouvelleLigne.innerHTML = `
                         <div class="col-md-4">
-                            <input type="time" name="generation_creneaux[horaires][${horaireIndex}][heure_debut]" class="form-control" value="09:00" required>
+                            <input type="time" name="${formName}[horaires][${index}][heure_debut]" class="form-control" value="09:00" required>
                         </div>
                         <div class="col-md-4">
-                            <input type="time" name="generation_creneaux[horaires][${horaireIndex}][heure_fin]" class="form-control" value="09:30" required>
+                            <input type="time" name="${formName}[horaires][${index}][heure_fin]" class="form-control" value="09:30" required>
                         </div>
                         <div class="col-md-4">
                             <button type="button" class="btn btn-danger btn-sm remove-horaire">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
-                    </div>
-                `;
-                container.insertAdjacentHTML('beforeend', template);
-                horaireIndex++;
-                
-                // Réactiver tous les boutons de suppression s'il y a plus d'un horaire
-                updateRemoveButtons();
-            });
-
-            // Supprimer un horaire
-            container.addEventListener('click', function(e) {
-                if (e.target.closest('.remove-horaire')) {
-                    const row = e.target.closest('.horaire-row');
-                    const rows = container.querySelectorAll('.horaire-row');
+                    `;
                     
-                    if (rows.length > 1) {
-                        row.remove();
-                        updateRemoveButtons();
-                    }
-                }
-            });
-
-            // Validation côté client pour éviter les heures de fin antérieures aux heures de début
-            container.addEventListener('change', function(e) {
-                if (e.target.type === 'time') {
-                    const row = e.target.closest('.horaire-row');
-                    const heureDebut = row.querySelector('input[name*="[heure_debut]"]').value;
-                    const heureFin = row.querySelector('input[name*="[heure_fin]"]').value;
+                    container.appendChild(nouvelleLigne);
                     
-                    if (heureDebut && heureFin && heureFin <= heureDebut) {
-                        alert('L\'heure de fin doit être postérieure à l\'heure de début');
-                        e.target.focus();
-                    }
-                }
-            });
+                    // Attacher l'événement au nouveau bouton
+                    const nouveauBouton = nouvelleLigne.querySelector('.remove-horaire');
+                    nouveauBouton.addEventListener('click', function(event) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        supprimerLigne(this);
+                    });
+                    
+                    index++;
+                });
+            }
         });
     </script>
-{% endblock %} 
+{% endblock %}
+
+ 
