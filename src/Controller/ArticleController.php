@@ -61,9 +61,18 @@ final class ArticleController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_article_show', methods: ['GET'])]
-    public function show(Article $article): Response
+    #[Route('/{id}', name: 'app_article_show', methods: ['GET'], requirements: ['id' => '\d+'])]
+    public function show(int $id, ArticleRepository $articleRepository): Response
     {
+        // Récupération manuelle pour éviter l'erreur EntityValueResolver
+        $article = $articleRepository->find($id);
+        
+        // Vérification si l'article existe
+        if (!$article) {
+            throw $this->createNotFoundException('Cet article n\'existe pas.');
+        }
+        
+        // Vérification si l'article est visible
         if (!$article->isVisible()) {
             throw $this->createNotFoundException('Cet article n\'est pas disponible.');
         }
