@@ -2,63 +2,91 @@
  * Navbar Component - Menu Hamburger
  * Gère l'ouverture/fermeture du menu mobile
  */
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('🍔 Navbar JS chargé !');
+
+// Fonctions utilitaires pour la navbar
+function getNavbarElements() {
+    return {
+        toggle: document.getElementById('navbar-toggle'),
+        menu: document.getElementById('navbar-menu')
+    };
+}
+
+function closeMenu() {
+    const { toggle, menu } = getNavbarElements();
+    if (!toggle || !menu) return;
     
-    const navbarToggle = document.getElementById('navbar-toggle');
-    const navbarMenu = document.getElementById('navbar-menu');
+    menu.classList.remove('active');
+    toggle.classList.remove('active');
+    toggle.setAttribute('aria-expanded', 'false');
+}
+
+function openMenu() {
+    const { toggle, menu } = getNavbarElements();
+    if (!toggle || !menu) return;
     
-    console.log('navbarToggle:', navbarToggle);
-    console.log('navbarMenu:', navbarMenu);
-    
-    // Vérification que les éléments existent
-    if (!navbarToggle || !navbarMenu) {
-        console.error('❌ Éléments navbar introuvables !');
+    menu.classList.add('active');
+    toggle.classList.add('active');
+    toggle.setAttribute('aria-expanded', 'true');
+}
+
+// Gestionnaire d'événements avec délégation
+document.addEventListener('click', function(e) {
+    // Gestion du bouton hamburger
+    if (e.target.closest('#navbar-toggle')) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const { toggle, menu } = getNavbarElements();
+        if (!toggle || !menu) return;
+        
+        const isOpen = menu.classList.contains('active');
+        
+        if (isOpen) {
+            closeMenu();
+        } else {
+            openMenu();
+        }
         return;
     }
     
-    console.log('✅ Éléments navbar trouvés !');
-    
-    // Toggle du menu hamburger
-    navbarToggle.addEventListener('click', function(e) {
-        e.preventDefault();
-        console.log('🍔 Clic sur le hamburger !');
+    // Gestion des liens de navigation
+    if (e.target.closest('.nav-link')) {
+        closeMenu();
         
-        navbarMenu.classList.toggle('active');
-        navbarToggle.classList.toggle('active');
-        
-        console.log('Menu actif:', navbarMenu.classList.contains('active'));
-        
-        // Accessibilité - mise à jour de l'attribut aria-expanded
-        const isExpanded = navbarMenu.classList.contains('active');
-        navbarToggle.setAttribute('aria-expanded', isExpanded);
-    });
-    
-    // Fermer le menu quand on clique sur un lien
-    const navLinks = document.querySelectorAll('.nav-link');
-    navLinks.forEach(link => {
-        link.addEventListener('click', function() {
-            navbarMenu.classList.remove('active');
-            navbarToggle.classList.remove('active');
-            navbarToggle.setAttribute('aria-expanded', 'false');
-        });
-    });
-    
-    // Fermer le menu avec la touche Escape
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && navbarMenu.classList.contains('active')) {
-            navbarMenu.classList.remove('active');
-            navbarToggle.classList.remove('active');
-            navbarToggle.setAttribute('aria-expanded', 'false');
-        }
-    });
+        // Double sécurité pour la fermeture
+        setTimeout(() => {
+            closeMenu();
+        }, 50);
+        return;
+    }
     
     // Fermer le menu si on clique en dehors
-    document.addEventListener('click', function(e) {
-        if (!navbarToggle.contains(e.target) && !navbarMenu.contains(e.target)) {
-            navbarMenu.classList.remove('active');
-            navbarToggle.classList.remove('active');
-            navbarToggle.setAttribute('aria-expanded', 'false');
+    const { toggle, menu } = getNavbarElements();
+    if (toggle && menu && menu.classList.contains('active')) {
+        if (!toggle.contains(e.target) && !menu.contains(e.target)) {
+            closeMenu();
         }
-    });
+    }
+});
+
+// Fermer le menu avec la touche Escape
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        const { menu } = getNavbarElements();
+        if (menu && menu.classList.contains('active')) {
+            closeMenu();
+        }
+    }
+});
+
+// Initialisation au chargement de la page
+document.addEventListener('DOMContentLoaded', function() {
+    const { toggle, menu } = getNavbarElements();
+    
+    if (!toggle || !menu) {
+        return;
+    }
+    
+    // S'assurer que le menu est fermé au chargement
+    closeMenu();
 });
