@@ -1,23 +1,18 @@
-twig ->
-Separer navbar et le body
 
-Reutiliser navbar dans /article
-faire le design des articles, lister.
-Page /admin pour l admin creer, editer, suprimer facilement? Bundle admin de symfony 
+
+BUGS À CORRIGER:
+- navbar dans prendre rdv 
+- animaion menu burger imcomplete
+  + fermeture animation pas tout le temps corecte
+-
+
+TODO:
+- navbar ordinateur lien
+- prendre rdv test creneaux
 
  Do you want to send an email to verify the user's email address after registration? (yes/no) [yes]:      
  > no
 
  Do you want to automatically authenticate the user after registration? (yes/no) [yes]:
  > yes
-
-articlecrudcontroller , importation du js de admin (ou en l'occurence de build/amins.js une fois compiler par webpack)
-
-
- 20/05
-    admin articlecrudcontroller => edition d'article ou creation article, mettre le trumbowyg .
-
-    instalation de webpack encore
-    re instalation de trumbowyg et jquery avec npm pour qu'ils soient dans le packages.json de webpack encore
-    Webpack essaie de compiler ton fichier assets/bootstrap.js qui importe @symfony/stimulus-bundle, mais ce package n’est pas installé.
 
