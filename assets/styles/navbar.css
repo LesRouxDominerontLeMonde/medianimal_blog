@@ -38,14 +38,14 @@ body {
     z-index: 1000;
     opacity: 0;
     transform: translateY(-20px);
-    transition: all 0.3s ease;
-    transition-delay: 0s;
+    transition: all 0.5s ease-in-out;
+    transition-delay: 0.2s;
 }
 
 .navbar-menu.active .navbar-brand2 {
     opacity: 1;
     transform: translateY(0);
-    transition-delay: 0.2s;
+    transition-delay: 0.3s;
 }
 
 .navbar-brand2 a {
@@ -72,7 +72,7 @@ body {
     width: 25px;
     height: 3px;
     background: #333;
-    transition: all 0.3s ease;
+    transition: all 0.5s ease-in-out;
 }
 
 /* Hamburger lines blanches quand le menu est ouvert */
@@ -101,12 +101,10 @@ body {
     right: 0;
     bottom: 0;
     background: transparent;
-    opacity: 0;
     pointer-events: none;
     z-index: 999;
     display: flex;
     flex-direction: column;
-    transition: opacity 0.4s ease;
 }
 
 .navbar-menu::before {
@@ -119,46 +117,47 @@ body {
     background: #DDBEA9;
     border-radius: 50%;
     transform: scale(0);
-    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: transform 0.5s ease-in-out;
+    transition-delay: 0.3s;
     z-index: -1;
 }
 
 .navbar-menu.active {
-    opacity: 1;
     pointer-events: auto;
 }
 
 .navbar-menu.active::before {
-    transform: scale(30);
+    transform: scale(35);
+    transition-delay: 0s;
 }
 
 .navbar-nav {
     list-style: none;
     margin: 0;
-    padding: 0;
+    padding: 0 0 0 6rem;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
     flex: 1;
     opacity: 0;
     transform: translateY(30px);
-    transition: all 0.4s ease;
-    transition-delay: 0s;
+    transition: all 0.6s ease-in-out;
+    transition-delay: 0.3s;
 }
 
 .navbar-menu.active .navbar-nav {
     opacity: 1;
     transform: translateY(0);
-    transition-delay: 0.15s;
+    transition-delay: 0.2s;
 }
 
 .nav-item {
     margin: 0;
     opacity: 0;
     transform: translateY(20px);
-    transition: all 0.3s ease;
-    transition-delay: 0s;
+    transition: all 0.5s ease-in-out;
+    transition-delay: 0.3s;
 }
 
 .navbar-menu.active .nav-item {
@@ -167,35 +166,35 @@ body {
 }
 
 .navbar-menu.active .nav-item:nth-child(1) {
-    transition-delay: 0.3s;
-}
-
-.navbar-menu.active .nav-item:nth-child(2) {
-    transition-delay: 0.35s;
-}
-
-.navbar-menu.active .nav-item:nth-child(3) {
     transition-delay: 0.4s;
 }
 
+.navbar-menu.active .nav-item:nth-child(2) {
+    transition-delay: 0.5s;
+}
+
+.navbar-menu.active .nav-item:nth-child(3) {
+    transition-delay: 0.6s;
+}
+
 .navbar-menu.active .nav-item:nth-child(4) {
-    transition-delay: 0.45s;
+    transition-delay: 0.7s;
 }
 
 .nav-link {
     display: block;
-    padding: 2rem 1rem;
+    padding: 1rem 1rem;
     text-decoration: none;
     color: #fff;
-    font-size: 18px;
+    font-size: 32px;
     font-weight: 400;
     border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-    transition: all 0.3s ease;
+    transition: all 0.3s ease-in-out;
     position: relative;
 }
 
 .nav-link:hover {
-    background-color: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.6);
 }
 
 /* Styles pour desktop (optionnel - vous pouvez personnaliser) */
@@ -207,11 +206,12 @@ body {
     .navbar-menu {
         position: static;
         transform: none;
-        opacity: 1;
         visibility: visible;
         background: transparent;
         display: block;
         flex-direction: unset;
+        pointer-events: auto;
+        margin-right: 25%;
     }
     
     .navbar-brand2 {
@@ -223,15 +223,23 @@ body {
         flex-direction: row;
         padding: 0;
         min-height: auto;
-        justify-content: flex-start;
+        justify-content: center;
+        opacity: 1;
+        transform: none;
+        flex: 1;
+    }
+    
+    .nav-item {
+        opacity: 1;
+        transform: none;
     }
     
     .nav-link {
         border: none;
         padding: 0.5rem 1rem;
         position: relative;
-        color: #333;
-        font-size: 12px;
+        color: #666;
+        font-size: 16px;
         text-align: left;
         transform: none;
     }
@@ -251,6 +259,7 @@ body {
     .nav-link:hover {
         background-color: transparent;
         text-shadow: -4px 4px 4px rgba(0, 0, 0, 0.3);
+        color: #000;
         transform: none;
     }
     
@@ -258,3 +267,34 @@ body {
         width: 80%;
     }
 }
+
+/* Transitions spécifiques pour la fermeture du menu */
+.navbar-menu:not(.active) .nav-item:nth-child(1) {
+    transition-delay: 0s;
+}
+
+.navbar-menu:not(.active) .nav-item:nth-child(2) {
+    transition-delay: 0.05s;
+}
+
+.navbar-menu:not(.active) .nav-item:nth-child(3) {
+    transition-delay: 0.1s;
+}
+
+.navbar-menu:not(.active) .nav-item:nth-child(4) {
+    transition-delay: 0.15s;
+}
+
+.navbar-menu:not(.active) .navbar-nav {
+    transition-delay: 0.2s;
+}
+
+.navbar-menu:not(.active) .navbar-brand2 {
+    transition-delay: 0s;
+}
+
+.navbar-menu:not(.active)::before {
+    transition-delay: 0.4s;
+}
+
+
