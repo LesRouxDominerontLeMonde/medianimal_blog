@@ -7,14 +7,33 @@
 {% endblock %}
 
 {% block body %}
+<!-- Section Banner -->
+<section class="blog-banner">
+    <img src="{{ asset('images/banners/blog-banner.jpg') }}" alt="Banner Blog Medianimal" class="banner-image">
+</section>
+
+<!-- Section Recommendation -->
+<section class="recommendation-section">
+    <div class="recommendation-navigation">
+        <div class="nav-number">1</div>
+        <div class="nav-number">2</div>
+        <div class="nav-number">3</div>
+    </div>
+    <div class="recommendation-content">
+        <time class="recommendation-date">23 avril</time>
+        <h2 class="recommendation-title">Comment appeler son chien correctement plus ultra</h2>
+        <p class="recommendation-excerpt">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore...</p>
+        <div class="recommendation-divider"></div>
+        <p class="recommendation-author">Laurent Figerman</p>
+    </div>
+</section>
+
 <div class="blog-container">
-    <header class="blog-header">
-        <h1 class="blog-title">Blog Medianimal</h1>
-        <p class="blog-subtitle">Découvrez nos derniers articles sur le bien-être animal</p>
-        {% if totalArticles > 0 %}
-            <p class="articles-info">{{ totalArticles }} article{{ totalArticles > 1 ? 's' : '' }} au total</p>
-        {% endif %}
-    </header>
+    {% if totalArticles > 0 %}
+        <div class="articles-info">
+            <p>{{ totalArticles }} article{{ totalArticles > 1 ? 's' : '' }} au total</p>
+        </div>
+    {% endif %}
 
     {% if articles|length > 0 %}
         <main class="articles-grid">
