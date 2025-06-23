@@ -11,14 +11,14 @@
 
 /* Compensation pour la navbar fixe */
 body {
-    padding-top: 70px;
+    padding-top: 80px;
 }
 
 .navbar-container {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1rem;
+    padding: 1.5rem;
     max-width: 1200px;
     margin: 0 auto;
 }
@@ -33,8 +33,8 @@ body {
 /* Logo dans le menu overlay - identique au principal */
 .navbar-brand2 {
     position: absolute;
-    top: 1rem;
-    left: 1rem;
+    top: 1.5rem;
+    left: 1.5rem;
     z-index: 1000;
     opacity: 0;
     transform: translateY(-20px);
@@ -110,8 +110,8 @@ body {
 .navbar-menu::before {
     content: '';
     position: absolute;
-    top: 1rem;
-    right: 1rem;
+    top: 1.5rem;
+    right: 1.5rem;
     width: 50px;
     height: 50px;
     background: #DDBEA9;
@@ -197,7 +197,7 @@ body {
     color: rgba(255, 255, 255, 0.6);
 }
 
-/* Styles pour desktop (optionnel - vous pouvez personnaliser) */
+/* Styles pour desktop */
 @media (min-width: 768px) {
     .navbar-toggle {
         display: none;
@@ -257,7 +257,6 @@ body {
     }
     
     .nav-link:hover {
-        background-color: transparent;
         text-shadow: -4px 4px 4px rgba(0, 0, 0, 0.3);
         color: #000;
         transform: none;

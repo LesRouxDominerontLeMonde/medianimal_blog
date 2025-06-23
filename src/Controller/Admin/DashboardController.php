@@ -72,5 +72,9 @@ class DashboardController extends AbstractDashboardController
             ->setPermission('ROLE_ADMIN');
         yield MenuItem::linkToCrud('Rendez-vous', 'fas fa-calendar-check', RendezVous::class)
             ->setPermission('ROLE_ADMIN');
+            
+        yield MenuItem::section('Administration');
+        yield MenuItem::linkToRoute('Mon Compte', 'fas fa-user-cog', 'admin_account')
+            ->setPermission('ROLE_ADMIN');
     }
 }

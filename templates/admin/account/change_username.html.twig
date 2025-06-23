@@ -1,0 +1,85 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier le nom d'utilisateur - Administration{% endblock %}
+
+{% block stylesheets %}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ path('admin') }}">Administration</a></li>
+            <li class="breadcrumb-item"><a href="{{ path('admin_account') }}">Mon Compte</a></li>
+            <li class="breadcrumb-item active">Modifier le nom d'utilisateur</li>
+        </ol>
+    </nav>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="fas fa-edit"></i> Modifier le nom d'utilisateur</h1>
+    </div>
+
+    {% for type, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ type == 'error' ? 'danger' : type }} alert-dismissible fade show">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endfor %}
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-user me-2"></i>
+                        Changer de nom d'utilisateur
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {{ form_start(form) }}
+                        {{ form_row(form.username) }}
+                        
+                        <div class="mt-3">
+                            {{ form_row(form.save) }}
+                            <a href="{{ path('admin_account') }}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>
+                                Annuler
+                            </a>
+                        </div>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="alert alert-info">
+                <h6 class="alert-heading">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Informations
+                </h6>
+                <ul class="mb-0">
+                    <li>Le nom d'utilisateur doit contenir entre 3 et 180 caractères</li>
+                    <li>Il doit être unique dans le système</li>
+                    <li>Une fois modifié, utilisez ce nouveau nom pour vous connecter</li>
+                </ul>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="card-title mb-0">Utilisateur actuel</h6>
+                </div>
+                <div class="card-body">
+                    <strong>Nom d'utilisateur :</strong> 
+                    <span class="badge bg-primary">{{ user.username }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+{% endblock %} 
