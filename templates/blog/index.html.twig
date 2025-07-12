@@ -6,109 +6,162 @@
     <link rel="stylesheet" href="{{ asset('styles/blog.css') }}">
 {% endblock %}
 
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('js/recommendation.js') }}"></script>
+{% endblock %}
+
 {% block body %}
 <!-- Section Banner -->
 <section class="blog-banner">
     <img src="{{ asset('images/banners/blog-banner.jpg') }}" alt="Banner Blog Medianimal" class="banner-image">
 </section>
 
-<!-- Section Recommendation -->
-<section class="recommendation-section">
-    <div class="recommendation-navigation">
-        <div class="nav-number">1</div>
-        <div class="nav-number">2</div>
-        <div class="nav-number">3</div>
+<!-- Section Recommandation -->
+<section class="recommandation-section">
+    <div class="recommandation-navigation">
+        <div class="nav-number activenumber">01</div>
+        <div class="nav-number">02</div>
+        <div class="nav-number">03</div>
     </div>
-    <div class="recommendation-content">
-        <time class="recommendation-date">23 avril</time>
-        <h2 class="recommendation-title">Comment appeler son chien correctement plus ultra</h2>
-        <p class="recommendation-excerpt">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore...</p>
-        <div class="recommendation-divider"></div>
-        <p class="recommendation-author">Laurent Figerman</p>
+    <div class="recommandation-content">
+        <!-- Extrait 1 - Actif par défaut -->
+        <div class="article-extract activeextract">
+            <time class="recommandation-date">23 avril</time>
+            <h2 class="recommandation-title">Comment appeler son chien correctement plus ultra</h2>
+            <p class="recommandation-excerpt">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore...</p>
+            <div class="recommandation-divider"></div>
+            <p class="recommandation-author">Laurent Figerman</p>
+        </div>
+        
+        <!-- Extrait 2 -->
+        <div class="article-extract">
+            <time class="recommandation-date">15 mai</time>
+            <h2 class="recommandation-title">Les secrets de l'alimentation canine moderne</h2>
+            <p class="recommandation-excerpt">Découvrez les nouvelles tendances en nutrition animale et comment adapter l'alimentation de votre compagnon...</p>
+            <div class="recommandation-divider"></div>
+            <p class="recommandation-author">Marie Dubois</p>
+        </div>
+        
+        <!-- Extrait 3 -->
+        <div class="article-extract">
+            <time class="recommandation-date">8 juin</time>
+            <h2 class="recommandation-title">Comportement félin : comprendre votre chat</h2>
+            <p class="recommandation-excerpt">Plongez dans l'univers mystérieux des félins et apprenez à décoder leurs comportements quotidiens...</p>
+            <div class="recommandation-divider"></div>
+            <p class="recommandation-author">Dr. Sophie Martin</p>
+        </div>
     </div>
 </section>
 
-<div class="blog-container">
-    {% if totalArticles > 0 %}
-        <div class="articles-info">
-            <p>{{ totalArticles }} article{{ totalArticles > 1 ? 's' : '' }} au total</p>
+<!-- Section Derniers Articles -->
+<section class="dernier-articles-section">
+    <div class="dernier-articles-container">
+        <div class="dernier-articles-header">
+            <h3 class="dernier-articles-title" id="derniers-articles">Derniers articles</h3>
+            <div class="articles-controls">
+                <div class="categories-filter">
+                    <button class="category-btn active" data-category="all">Tout voir</button>
+                    <button class="category-btn" data-category="chien">Chien</button>
+                    <button class="category-btn" data-category="chat">Chat</button>
+                    <button class="category-btn" data-category="exotique">Animaux exotiques</button>
+                    <button class="category-btn" data-category="cheval">Cheval</button>
+                </div>
+                <button class="shuffle-btn" id="shuffleBtn">
+                    🔀 Mélanger
+                </button>
+            </div>
         </div>
-    {% endif %}
-
-    {% if articles|length > 0 %}
-        <main class="articles-grid">
+        
+        <div class="articles-masonry-grid">
             {% for article in articles %}
-                <article class="article-card" onclick="window.location.href='{{ path('app_article_show', {id: article.id}) }}'">
+                <article class="masonry-card" onclick="window.location.href='{{ path('app_article_show', {id: article.id}) }}'">
                     {% if article.imageMainPath %}
                         <img src="{{ asset('images/articles/' ~ article.imageMainPath) }}" 
                              alt="{{ article.title }}" 
-                             class="article-image">
+                             class="masonry-image">
                     {% else %}
-                        <div class="article-image" style="display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-size: 1.2rem;">
+                        <div class="masonry-image masonry-placeholder">
                             📖 Article
                         </div>
                     {% endif %}
                     
-                    <div class="article-content">
-                        <time class="article-date" datetime="{{ article.publishedAt|date('Y-m-d') }}">
+                    <div class="masonry-content">
+                        <time class="masonry-date" datetime="{{ article.publishedAt|date('Y-m-d') }}">
                             {{ article.publishedAt|date('d/m/Y') }}
                         </time>
                         
-                        <h2 class="article-title-card">{{ article.title }}</h2>
+                        <h3 class="masonry-title">{{ article.title }}</h3>
                         
-                        <p class="article-excerpt">
-                            {{ article.content|striptags|slice(0, 150) }}{% if article.content|length > 150 %}...{% endif %}
+                        <p class="masonry-excerpt">
+                            {{ article.content|striptags|slice(0, 120) }}{% if article.content|length > 120 %}...{% endif %}
                         </p>
                         
-                        <a href="{{ path('app_article_show', {id: article.id}) }}" class="read-more">
+                        <a href="{{ path('app_article_show', {id: article.id}) }}" class="masonry-read-more">
                             Lire la suite →
                         </a>
                     </div>
                 </article>
             {% endfor %}
-        </main>
-
+        </div>
+        
         {% if totalPages > 1 %}
-            <nav class="pagination">
+            <nav class="dernier-articles-pagination">
                 {% if currentPage > 1 %}
-                    <a href="{{ path('app_blog', {page: currentPage - 1}) }}" class="pagination-btn">
-                        ← Précédent
+                    <a href="{{ path('app_blog', {page: currentPage - 1}) }}#derniers-articles" class="pagination-btn-small">
+                        Page précédente
                     </a>
-                {% else %}
-                    <span class="pagination-btn disabled">← Précédent</span>
                 {% endif %}
 
-                {% for page in 1..totalPages %}
+                {% set startPage = max(1, currentPage - 1) %}
+                {% set endPage = min(totalPages, currentPage + 1) %}
+                
+                {% if startPage > 1 %}
+                    <a href="{{ path('app_blog', {page: 1}) }}#derniers-articles" class="pagination-btn-small">{{ '%02d'|format(1) }}</a>
+                    {% if startPage > 2 %}
+                        <span class="pagination-btn-small">...</span>
+                    {% endif %}
+                {% endif %}
+
+                {% for page in startPage..endPage %}
                     {% if page == currentPage %}
-                        <span class="pagination-btn active">{{ page }}</span>
-                    {% elseif page == 1 or page == totalPages or (page >= currentPage - 2 and page <= currentPage + 2) %}
-                        <a href="{{ path('app_blog', {page: page}) }}" class="pagination-btn">{{ page }}</a>
-                    {% elseif page == currentPage - 3 or page == currentPage + 3 %}
-                        <span class="pagination-btn disabled">...</span>
+                        <span class="pagination-btn-small active">{{ '%02d'|format(page) }}</span>
+                    {% else %}
+                        <a href="{{ path('app_blog', {page: page}) }}#derniers-articles" class="pagination-btn-small">{{ '%02d'|format(page) }}</a>
                     {% endif %}
                 {% endfor %}
 
+                {% if endPage < totalPages %}
+                    {% if endPage < totalPages - 1 %}
+                        <span class="pagination-btn-small">...</span>
+                    {% endif %}
+                    <a href="{{ path('app_blog', {page: totalPages}) }}#derniers-articles" class="pagination-btn-small">{{ '%02d'|format(totalPages) }}</a>
+                {% endif %}
+
                 {% if currentPage < totalPages %}
-                    <a href="{{ path('app_blog', {page: currentPage + 1}) }}" class="pagination-btn">
-                        Suivant →
+                    <a href="{{ path('app_blog', {page: currentPage + 1}) }}#derniers-articles" class="pagination-btn-small">
+                        Page suivante
                     </a>
-                {% else %}
-                    <span class="pagination-btn disabled">Suivant →</span>
                 {% endif %}
             </nav>
-
-            <div class="pagination-info">
-                Page {{ currentPage }} sur {{ totalPages }} 
-                ({{ (currentPage - 1) * 6 + 1 }} à {{ currentPage * 6 > totalArticles ? totalArticles : currentPage * 6 }} 
-                sur {{ totalArticles }} articles)
-            </div>
         {% endif %}
-    {% else %}
-        <div class="no-articles">
-            <div class="no-articles-icon">📝</div>
-            <h2>Aucun article publié</h2>
-            <p>Les articles apparaîtront ici une fois publiés.</p>
+    </div>
+</section>
+
+<!-- Section Recommandation Banner -->
+<section class="recommandation-banner-container">
+    <div class="recommandation-banner">
+        <img src="{{ asset('images/articles/1-6867b78ab4bc5573453580.jpg') }}" alt="Recommandation Banner Medianimal" class="recommandation-banner-image active-image">
+        <img src="{{ asset('images/articles/1-6867b78ab4bc5573453580.jpg') }}" alt="Recommandation Banner Medianimal" class="recommandation-banner-image hidden-image">
+        <h2 class="recommandation-banner-title activebannertext">Recommandation de race de chien amis des enfants</h2>
+        <h2 class="recommandation-banner-title">Les secrets de l'alimentation canine moderne</h2>
+        <h2 class="recommandation-banner-title">Comportement félin : comprendre votre chat</h2>
+        <div class="recommandation-banner-navigation">
+            <div class="nav-number activenumber">01</div>
+            <div class="nav-number">02</div>
+            <div class="nav-number">03</div>
         </div>
-    {% endif %}
-</div>
+    </div>
+</section>
+
 {% endblock %} 

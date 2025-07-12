@@ -37,7 +37,7 @@ final class ArticleController extends AbstractController
     public function blog(Request $request, ArticleRepository $articleRepository): Response
     {
         $page = $request->query->getInt('page', 1);
-        $limit = 6; // Nombre d'articles par page
+        $limit = 8; // Nombre d'articles par page
 
         $queryBuilder = $articleRepository->createQueryBuilder('a')
             ->where('a.isPublished = :published')

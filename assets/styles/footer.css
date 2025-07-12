@@ -1,0 +1,131 @@
+
+
+/* ===== FOOTER ===== */
+.site-footer {
+    margin-top: 40px;
+    border-top: 2px solid var(--color-gris-clair);
+    background-color: #f8f9fa;
+    padding-top: 40px; /* 2 fois plus que le padding bottom */
+    padding-bottom: 20px;
+    box-sizing: border-box;
+}
+
+.footer-container {
+    width: calc(100vw - 18px);
+    margin: 0;
+    padding-left: var(--bord);
+    padding-right: var(--bord);
+    box-sizing: border-box;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.footer-title {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--color-noir);
+    margin: 0;
+    flex-shrink: 0;
+}
+
+.footer-nav {
+    display: flex;
+    gap: 30px;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
+    flex-grow: 1;
+}
+
+.footer-link {
+    color: var(--color-texte);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: color 0.3s ease;
+    padding: 8px 12px;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+.footer-link:hover {
+    color: var(--color-noir);
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.footer-credit {
+    font-size: 0.85rem;
+    color: var(--color-texte);
+    margin: 0;
+    flex-shrink: 0;
+    font-style: italic;
+}
+
+/* ===== MEDIA QUERIES RESPONSIVE ===== */
+
+/* Mobile (max-width: 767px) */
+@media (max-width: 767px) {
+    .footer-container {
+        flex-direction: column;
+        text-align: center;
+        gap: 25px;
+    }
+    
+    .footer-nav {
+        gap: 20px;
+        flex-direction: column;
+    }
+    
+    .footer-link {
+        font-size: 0.85rem;
+    }
+    
+    .footer-title {
+        font-size: 1.1rem;
+    }
+    
+    .footer-credit {
+        font-size: 0.8rem;
+    }
+}
+
+/* Tablette (min-width: 768px) */
+@media (min-width: 768px) {
+    
+    .footer-nav {
+        gap: 35px;
+    }
+    
+    .footer-title {
+        font-size: 1.3rem;
+    }
+}
+
+/* Desktop (min-width: 1024px) */
+@media (min-width: 1024px) {
+    .site-footer {
+        padding-top: 50px; /* 2 fois plus que le padding bottom */
+        padding-bottom: 25px;
+    }
+    
+    .footer-nav {
+        gap: 40px;
+    }
+    
+    .footer-title {
+        font-size: 1.4rem;
+    }
+    
+    .footer-link {
+        font-size: 1rem;
+    }
+    
+    .footer-credit {
+        font-size: 0.9rem;
+    }
+}
+
+ 

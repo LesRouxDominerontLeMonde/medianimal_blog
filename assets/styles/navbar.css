@@ -9,18 +9,19 @@
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-/* Compensation pour la navbar fixe */
+/* Compensation pour la navbar fixe - géré dynamiquement par JavaScript */
 body {
-    padding-top: 80px;
+    padding-top: 0;
 }
 
 .navbar-container {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1.5rem;
-    max-width: 1200px;
-    margin: 0 auto;
+    width: calc(100vw - 18px);
+    margin: 0;
+    padding: 0.85rem var(--bord);
+    box-sizing: border-box;
 }
 
 .navbar-brand a {
@@ -30,11 +31,38 @@ body {
     color: #333;
 }
 
+/* Section des réseaux sociaux - visible sur mobile au centre */
+.navbar-social {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.social-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    margin: 0 8px;
+    text-decoration: none;
+    color: #666;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    font-size: 18px;
+}
+
+.social-link:hover {
+    color: var(--color-accent);
+    background-color: rgba(221, 190, 169, 0.1);
+    transform: translateY(-2px);
+}
+
 /* Logo dans le menu overlay - identique au principal */
 .navbar-brand2 {
     position: absolute;
-    top: 1.5rem;
-    left: 1.5rem;
+    top: 0.75rem;
+    left: var(--bord);
     z-index: 1000;
     opacity: 0;
     transform: translateY(-20px);
@@ -110,11 +138,11 @@ body {
 .navbar-menu::before {
     content: '';
     position: absolute;
-    top: 1.5rem;
-    right: 1.5rem;
+    top: 0.75rem;
+    right: var(--bord);
     width: 50px;
     height: 50px;
-    background: #DDBEA9;
+    background: var(--color-accent);
     border-radius: 50%;
     transform: scale(0);
     transition: transform 0.5s ease-in-out;
@@ -203,6 +231,11 @@ body {
         display: none;
     }
     
+    /* Réseaux sociaux sur desktop */
+    .navbar-social {
+        gap: 5px;
+    }
+    
     .navbar-menu {
         position: static;
         transform: none;
@@ -211,7 +244,6 @@ body {
         display: block;
         flex-direction: unset;
         pointer-events: auto;
-        margin-right: 25%;
     }
     
     .navbar-brand2 {
@@ -236,10 +268,10 @@ body {
     
     .nav-link {
         border: none;
-        padding: 0.5rem 1rem;
+        padding: 0.25rem 1rem;
         position: relative;
         color: #666;
-        font-size: 16px;
+        font-size: 14px;
         text-align: left;
         transform: none;
     }
@@ -251,7 +283,7 @@ body {
         left: 50%;
         width: 0;
         height: 2px;
-        background-color: #DDBEA9;
+        background-color: var(--color-accent);
         transform: translateX(-50%);
         transition: width 0.3s ease;
     }
@@ -295,5 +327,6 @@ body {
 .navbar-menu:not(.active)::before {
     transition-delay: 0.4s;
 }
+
 
 

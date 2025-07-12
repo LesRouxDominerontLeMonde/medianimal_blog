@@ -79,88 +79,57 @@
 {% endblock %}
 
 {% block body %}
-<article class="article-container" itemscope itemtype="https://schema.org/NewsArticle">
-    <!-- Breadcrumb Navigation -->
-    <nav class="breadcrumb" aria-label="Fil d'Ariane">
-        <a href="{{ path('app_blog') }}">Blog</a>
-        <span class="breadcrumb-separator">›</span>
-        <span class="breadcrumb-current">{{ article.title }}</span>
-    </nav>
+<article class="new-article-container" itemscope itemtype="https://schema.org/NewsArticle">
+    
+    <!-- Hero Banner avec image de fond -->
+    <section class="article-hero" 
+             {% if article.imageMainPath %}
+             style="background-image: url('{{ asset('images/articles/' ~ article.imageMainPath) }}');"
+             {% endif %}>
+        <div class="article-hero-overlay">
+            <div class="article-hero-content">
+                <h1 class="article-hero-title" itemprop="headline">{{ article.title }}</h1>
+            </div>
+        </div>
+    </section>
 
-    <!-- En-tête de l'article -->
-    <header class="article-header">
-        <h1 class="article-title" itemprop="headline">{{ article.title }}</h1>
+    <!-- Contenu principal de l'article -->
+    <div class="article-main-content">
         
-        <div class="article-meta">
+        <!-- Informations de l'article -->
+        <div class="article-info">
             <time class="article-date" 
                   datetime="{{ article.publishedAt|date('c') }}" 
                   itemprop="datePublished">
-                Publié le {{ article.publishedAt|date('d/m/Y à H:i') }}
+                {{ article.publishedAt|date('d/m/Y') }}
             </time>
-            
-            {% if article.createdAt != article.publishedAt %}
-                <time class="article-updated" 
-                      datetime="{{ article.createdAt|date('c') }}" 
-                      itemprop="dateModified">
-                    Mis à jour le {{ article.createdAt|date('d/m/Y à H:i') }}
-                </time>
-            {% endif %}
-            
+            <span class="article-separator">•</span>
             <span class="article-author" itemprop="author" itemscope itemtype="https://schema.org/Organization">
                 <span itemprop="name">Medianimal</span>
             </span>
         </div>
-    </header>
 
-    <!-- Image principale -->
-    {% if article.imageMainPath %}
-        <figure class="article-image-container" itemprop="image" itemscope itemtype="https://schema.org/ImageObject">
-            <img src="{{ asset('images/articles/' ~ article.imageMainPath) }}" 
-                 alt="{{ article.title }}" 
-                 class="article-image"
-                 itemprop="url">
-            <meta itemprop="width" content="800">
-            <meta itemprop="height" content="600">
-        </figure>
-    {% endif %}
+        <!-- Contenu de l'article -->
+        <div class="article-content" id="article-body" itemprop="articleBody">
+            {{ article.content|raw }}
+        </div>
 
-    <!-- Contenu de l'article -->
-    <div class="article-content" id="article-body" itemprop="articleBody">
-        {{ article.content|raw }}
+        <!-- Image alternative à la fin -->
+        {% if article.imageAltPath %}
+            <section class="article-alt-image-section">
+                <div class="article-alt-image-container" 
+                     style="background-image: url('{{ asset('images/articles/' ~ article.imageAltPath) }}');">
+                </div>
+            </section>
+        {% endif %}
+
+        <!-- Navigation de retour -->
+        <nav class="article-navigation">
+            <a href="{{ path('app_blog') }}" class="back-to-blog">
+                ← Retour au blog
+            </a>
+        </nav>
     </div>
-
-    <!-- Footer de l'article -->
-    <footer class="article-footer">
-        <div class="article-tags">
-            <span class="tag-label">Catégorie :</span>
-            <span class="tag" itemprop="articleSection">Bien-être animal</span>
-        </div>
-        
-        <div class="article-share">
-            <span class="share-label">Partager :</span>
-            <a href="https://twitter.com/intent/tweet?text={{ article.title|url_encode }}&url={{ app.request.uri|url_encode }}" 
-               target="_blank" 
-               rel="noopener" 
-               class="share-btn twitter"
-               aria-label="Partager sur Twitter">
-                🐦 Twitter
-            </a>
-            <a href="https://www.facebook.com/sharer/sharer.php?u={{ app.request.uri|url_encode }}" 
-               target="_blank" 
-               rel="noopener" 
-               class="share-btn facebook"
-               aria-label="Partager sur Facebook">
-                📘 Facebook
-            </a>
-        </div>
-    </footer>
-
-    <!-- Navigation vers d'autres articles -->
-    <nav class="article-navigation">
-        <a href="{{ path('app_blog') }}" class="back-to-blog">
-            ← Retour au blog
-        </a>
-    </nav>
 
     <!-- Métadonnées cachées pour les moteurs de recherche -->
     <div style="display: none;">
@@ -173,6 +142,11 @@
         <span itemprop="mainEntityOfPage" itemscope itemtype="https://schema.org/WebPage">
             <span itemprop="@id">{{ app.request.uri }}</span>
         </span>
+        {% if article.createdAt != article.publishedAt %}
+            <time datetime="{{ article.createdAt|date('c') }}" itemprop="dateModified">
+                {{ article.createdAt|date('d/m/Y à H:i') }}
+            </time>
+        {% endif %}
     </div>
 </article>
 {% endblock %}

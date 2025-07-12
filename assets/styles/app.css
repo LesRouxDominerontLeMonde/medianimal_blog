@@ -1,3 +1,31 @@
+/* ========================================
+   VARIABLES CSS GLOBALES - MEDIANIMAL
+======================================== */
+
+:root {
+    /* Couleurs principales */
+    --color-noir: #212529;
+    --color-texte: #495057;
+    --color-background: #f7f7f7;
+    --color-gris-clair: #C4C4C4;
+    --color-accent: #DDBEA9;
+    
+    /* Variables de layout responsive */
+    --bord: 6.75vw;      /* 0.0675 * largeur écran - pour les bordures */
+    --ligne: 5.3vw;      /* 0.053 * largeur écran - pour les lignes */
+    --gap-ligne: 2.1vw;  /* 0.021 * largeur écran - pour les espaces entre lignes */
+    
+    /* Marge de page responsive - de base 3.75rem, augmente proportionnellement après 1217px */
+    --page-margin: max(3.75rem, calc(3.75rem + (100vw - 1217px) * 0.25));
+}
+
+/* Reset global minimal */
+* {
+    box-sizing: border-box;
+}
+
+/* Body global avec padding responsive */
 body {
-    background-color: skyblue;
+    padding-left: var(--bord);
+    padding-right: var(--bord);
 }

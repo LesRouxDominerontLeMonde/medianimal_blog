@@ -29,6 +29,26 @@ function openMenu() {
     toggle.setAttribute('aria-expanded', 'true');
 }
 
+// Fonction pour ajuster la position du banner selon la hauteur de la navbar
+function adjustBannerPosition() {
+    const navbar = document.querySelector('.navbar');
+    const banner = document.querySelector('.blog-banner');
+    const body = document.body;
+    
+    if (!navbar) return;
+    
+    // Mesurer la hauteur réelle de la navbar
+    const navbarHeight = navbar.offsetHeight;
+    
+    // Appliquer le padding-top au body pour compenser la navbar fixed
+    body.style.paddingTop = navbarHeight + 'px';
+    
+    // Si le banner existe, le positionner juste après la navbar
+    if (banner) {
+        banner.style.marginTop = '0px';
+    }
+}
+
 // Gestionnaire d'événements avec délégation
 document.addEventListener('click', function(e) {
     // Gestion du bouton hamburger
@@ -84,9 +104,23 @@ document.addEventListener('DOMContentLoaded', function() {
     const { toggle, menu } = getNavbarElements();
     
     if (!toggle || !menu) {
+        // Même sans éléments navbar, ajuster la position
+        adjustBannerPosition();
         return;
     }
     
     // S'assurer que le menu est fermé au chargement
     closeMenu();
+    
+    // Ajuster la position du banner
+    adjustBannerPosition();
 });
+
+// Réajuster au redimensionnement de la fenêtre
+window.addEventListener('resize', function() {
+    // Petit délai pour s'assurer que le DOM est stable après le resize
+    setTimeout(adjustBannerPosition, 10);
+});
+
+// Réajuster après le chargement complet (polices, etc.)
+window.addEventListener('load', adjustBannerPosition);
