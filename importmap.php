@@ -16,7 +16,6 @@ return [
         'path' => './assets/app.js',
         'entrypoint' => true,
     ],
-
     '@hotwired/stimulus' => [
         'version' => '3.2.2',
     ],
@@ -31,5 +30,15 @@ return [
     ],
     'trumbowyg' => [
         'version' => '2.31.0',
+    ],
+    'leaflet' => [
+        'version' => '1.9.4',
+    ],
+    'leaflet/dist/leaflet.min.css' => [
+        'version' => '1.9.4',
+        'type' => 'css',
+    ],
+    '@symfony/ux-leaflet-map' => [
+        'path' => './vendor/symfony/ux-leaflet-map/assets/dist/map_controller.js',
     ],
 ];
