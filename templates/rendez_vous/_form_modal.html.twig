@@ -1,0 +1,60 @@
+{{ form_start(form, {'attr': {'id': 'form-reservation', 'class': 'needs-validation', 'novalidate': true}}) }}
+
+<div class="row mb-3">
+    <div class="col-md-6">
+        {{ form_row(form.prenom, {
+            'attr': {
+                'class': 'form-control',
+                'required': true
+            }
+        }) }}
+    </div>
+    <div class="col-md-6">
+        {{ form_row(form.nom, {
+            'attr': {
+                'class': 'form-control',
+                'required': true
+            }
+        }) }}
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col-md-6">
+        {{ form_row(form.email, {
+            'attr': {
+                'class': 'form-control',
+                'required': true
+            }
+        }) }}
+    </div>
+    <div class="col-md-6">
+        {{ form_row(form.telephone, {
+            'attr': {
+                'class': 'form-control',
+                'required': true
+            }
+        }) }}
+    </div>
+</div>
+
+<div class="mb-3">
+    {{ form_row(form.message, {
+        'attr': {
+            'class': 'form-control',
+            'rows': 3
+        }
+    }) }}
+</div>
+
+<div class="alert alert-info">
+    <i class="fas fa-info-circle me-2"></i>
+    <strong>Votre créneau :</strong><br>
+    <i class="fas fa-calendar me-1"></i> {{ creneau.dateDebut|date('d/m/Y') }}<br>
+    <i class="fas fa-clock me-1"></i> {{ creneau.dateDebut|date('H:i') }} - {{ creneau.dateFin|date('H:i') }}<br>
+    {% if creneau.titre %}
+        <i class="fas fa-tag me-1"></i> {{ creneau.titre }}
+    {% endif %}
+</div>
+
+{{ form_end(form) }} 

@@ -77,8 +77,38 @@ final class ArticleController extends AbstractController
             throw $this->createNotFoundException('Cet article n\'est pas disponible.');
         }
 
+        // Récupération de l'article précédent
+        $previousArticle = $articleRepository->createQueryBuilder('a')
+            ->where('a.isPublished = :published')
+            ->andWhere('a.publishedAt IS NOT NULL')
+            ->andWhere('a.publishedAt <= :now')
+            ->andWhere('a.publishedAt < :currentDate')
+            ->setParameter('published', true)
+            ->setParameter('now', new \DateTimeImmutable())
+            ->setParameter('currentDate', $article->getPublishedAt())
+            ->orderBy('a.publishedAt', 'DESC')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+
+        // Récupération de l'article suivant
+        $nextArticle = $articleRepository->createQueryBuilder('a')
+            ->where('a.isPublished = :published')
+            ->andWhere('a.publishedAt IS NOT NULL')
+            ->andWhere('a.publishedAt <= :now')
+            ->andWhere('a.publishedAt > :currentDate')
+            ->setParameter('published', true)
+            ->setParameter('now', new \DateTimeImmutable())
+            ->setParameter('currentDate', $article->getPublishedAt())
+            ->orderBy('a.publishedAt', 'ASC')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+
         return $this->render('article/show.html.twig', [
             'article' => $article,
+            'previousArticle' => $previousArticle,
+            'nextArticle' => $nextArticle,
         ]);
     }
 }

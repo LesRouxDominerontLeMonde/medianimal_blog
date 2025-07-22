@@ -60,6 +60,7 @@ class RendezVousType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => RendezVous::class,
+            'csrf_protection' => false, // Désactiver temporairement pour les requêtes AJAX
         ]);
     }
 } 

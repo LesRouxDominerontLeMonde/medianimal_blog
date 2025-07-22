@@ -5,6 +5,7 @@ namespace App\Controller\Admin;
 use App\Entity\Creneau;
 use App\Form\GenerationCreneauxType;
 use App\Service\GenerateurCreneaux;
+use App\Service\NettoyageCreneauxService;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
@@ -15,6 +16,9 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
+use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
+use EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -23,7 +27,8 @@ class CreneauCrudController extends AbstractCrudController
 {
     public function __construct(
         private GenerateurCreneaux $generateurCreneaux,
-        private AdminUrlGenerator $adminUrlGenerator
+        private AdminUrlGenerator $adminUrlGenerator,
+        private NettoyageCreneauxService $nettoyageCreneauxService
     ) {
     }
 
@@ -54,7 +59,7 @@ class CreneauCrudController extends AbstractCrudController
             ->add(Crud::PAGE_INDEX, Action::DETAIL)
             ->add(Crud::PAGE_INDEX, $genererCreneaux)
             ->update(Crud::PAGE_INDEX, Action::NEW, function (Action $action) {
-                return $action->setLabel('Générer un créneau');
+                return $action->setLabel('Créer un créneau');
             })
             ->update(Crud::PAGE_INDEX, Action::EDIT, function (Action $action) {
                 return $action->setLabel('Modifier');
@@ -97,6 +102,54 @@ class CreneauCrudController extends AbstractCrudController
                 ->setFormat('dd/MM/yyyy HH:mm')
                 ->onlyOnDetail(),
         ];
+    }
+
+    /**
+     * Méthode appelée lors de la création d'un nouveau créneau
+     */
+    public function persistEntity(EntityManagerInterface $entityManager, $entityInstance): void
+    {
+        parent::persistEntity($entityManager, $entityInstance);
+        
+        /** @var Creneau $entityInstance */
+        $this->addFlash('success', sprintf(
+            'Le créneau "%s" du %s a été créé avec succès !',
+            $entityInstance->getTitre() ?: 'Sans titre',
+            $entityInstance->getDateDebut()->format('d/m/Y à H:i')
+        ));
+    }
+
+    /**
+     * Méthode appelée lors de la modification d'un créneau
+     */
+    public function updateEntity(EntityManagerInterface $entityManager, $entityInstance): void
+    {
+        parent::updateEntity($entityManager, $entityInstance);
+        
+        /** @var Creneau $entityInstance */
+        $this->addFlash('success', sprintf(
+            'Le créneau "%s" du %s a été modifié avec succès !',
+            $entityInstance->getTitre() ?: 'Sans titre',
+            $entityInstance->getDateDebut()->format('d/m/Y à H:i')
+        ));
+    }
+
+    /**
+     * Méthode appelée lors de la suppression d'un créneau
+     */
+    public function deleteEntity(EntityManagerInterface $entityManager, $entityInstance): void
+    {
+        /** @var Creneau $entityInstance */
+        $titre = $entityInstance->getTitre() ?: 'Sans titre';
+        $dateFormatee = $entityInstance->getDateDebut()->format('d/m/Y à H:i');
+        
+        parent::deleteEntity($entityManager, $entityInstance);
+        
+        $this->addFlash('success', sprintf(
+            'Le créneau "%s" du %s a été supprimé avec succès !',
+            $titre,
+            $dateFormatee
+        ));
     }
 
     #[Route('/admin/creneaux/generer', name: 'admin_generer_creneaux')]
@@ -174,5 +227,42 @@ class CreneauCrudController extends AbstractCrudController
             'preview' => $preview,
             'results' => $results,
         ]);
+    }
+
+
+
+    /**
+     * Surcharge pour déclencher automatiquement le nettoyage lors de l'affichage de la liste
+     */
+    public function configureResponseParameters(KeyValueStore $responseParameters): KeyValueStore
+    {
+        // Déclencher automatiquement le nettoyage des créneaux passés (silencieusement)
+        $this->nettoyageAutomatiqueSilencieux();
+
+        return parent::configureResponseParameters($responseParameters);
+    }
+
+    /**
+     * Nettoyage automatique silencieux (sans message flash)
+     */
+    private function nettoyageAutomatiqueSilencieux(): void
+    {
+        try {
+            // Vérifier d'abord s'il y a des créneaux à nettoyer pour éviter les logs inutiles
+            if ($this->nettoyageCreneauxService->aDesCreneauxANettoyer()) {
+                $results = $this->nettoyageCreneauxService->supprimerCreneauxPassesNonReserves();
+                
+                // Optionnel : ajouter un message flash discret seulement si des créneaux ont été supprimés
+                if ($results['success'] && $results['nombre_supprimes'] > 0) {
+                    $this->addFlash('info', sprintf(
+                        'Nettoyage automatique : %d créneaux passés ont été supprimés.',
+                        $results['nombre_supprimes']
+                    ));
+                }
+            }
+        } catch (\Exception $e) {
+            // Log l'erreur mais ne pas interrompre l'affichage de la page
+            error_log('Erreur lors du nettoyage automatique des créneaux : ' . $e->getMessage());
+        }
     }
 } 

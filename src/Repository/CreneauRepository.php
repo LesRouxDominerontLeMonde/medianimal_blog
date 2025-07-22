@@ -81,4 +81,50 @@ class CreneauRepository extends ServiceEntityRepository
 
         return $qb->getQuery()->getResult() === [];
     }
+
+    /**
+     * Récupère les créneaux passés non réservés
+     */
+    public function findCreneauxPassesNonReserves(): array
+    {
+        return $this->createQueryBuilder('c')
+            ->leftJoin('c.rendezVous', 'rv')
+            ->where('c.dateFin < :now')
+            ->andWhere('rv.id IS NULL')
+            ->setParameter('now', new \DateTime())
+            ->orderBy('c.dateDebut', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * Supprime les créneaux passés non réservés
+     */
+    public function supprimerCreneauxPassesNonReserves(): int
+    {
+        // Récupérer d'abord les IDs des créneaux à supprimer
+        $creneauxIds = $this->createQueryBuilder('c')
+            ->select('c.id')
+            ->leftJoin('c.rendezVous', 'rv')
+            ->where('c.dateFin < :now')
+            ->andWhere('rv.id IS NULL')
+            ->setParameter('now', new \DateTime())
+            ->getQuery()
+            ->getResult();
+
+        if (empty($creneauxIds)) {
+            return 0;
+        }
+
+        // Extraire les IDs
+        $ids = array_column($creneauxIds, 'id');
+
+        // Supprimer les créneaux par IDs
+        return $this->createQueryBuilder('c')
+            ->delete()
+            ->where('c.id IN (:ids)')
+            ->setParameter('ids', $ids)
+            ->getQuery()
+            ->execute();
+    }
 } 

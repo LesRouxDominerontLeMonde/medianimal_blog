@@ -40,6 +40,55 @@
             padding: 1.5rem;
             margin-bottom: 2rem;
         }
+        
+        /* Styles pour la modal de réservation */
+        .modal-lg {
+            max-width: 600px;
+        }
+        
+        .modal-header.bg-primary {
+            border-bottom: none;
+        }
+        
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+        
+        .form-label {
+            font-weight: 500;
+            color: #495057;
+            margin-bottom: 0.5rem;
+        }
+        
+        .alert-info {
+            background-color: #e3f2fd;
+            border-color: #bbdefb;
+            color: #1976d2;
+        }
+        
+        .position-fixed.alert {
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            border-radius: 10px;
+        }
+        
+        .was-validated .form-control:invalid {
+            border-color: #dc3545;
+        }
+        
+        .was-validated .form-control:valid {
+            border-color: #28a745;
+        }
+        
+        .btn-success {
+            background-color: #28a745;
+            border-color: #28a745;
+        }
+        
+        .btn-success:hover {
+            background-color: #218838;
+            border-color: #1e7e34;
+        }
     </style>
 {% endblock %}
 
@@ -144,25 +193,32 @@
         </div>
     </div>
 
-    <!-- Modal pour les détails du créneau -->
+    <!-- Modal pour la réservation -->
     <div class="modal fade" id="creneauModal" tabindex="-1">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Détails du créneau</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">
+                        <i class="fas fa-calendar-plus me-2"></i>
+                        Réserver votre rendez-vous
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <div id="creneauDetails">
                         <!-- Contenu dynamique -->
                     </div>
+                    <div id="alertContainer"></div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
-                    <a href="#" id="btnReserver" class="btn btn-primary">
-                        <i class="fas fa-calendar-plus me-2"></i>
-                        Réserver ce créneau
-                    </a>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>
+                        Annuler
+                    </button>
+                    <button type="button" id="btnConfirmerReservation" class="btn btn-success">
+                        <i class="fas fa-check me-2"></i>
+                        Confirmer la réservation
+                    </button>
                 </div>
             </div>
         </div>
@@ -186,6 +242,7 @@
             const calendar = new FullCalendar.Calendar(calendarEl, {
                 initialView: 'timeGridWeek',
                 locale: 'fr',
+                timeZone: 'local', // Forcer l'utilisation du fuseau horaire local
                 headerToolbar: {
                     left: 'prev,next today',
                     center: 'title',
@@ -207,27 +264,8 @@
                 },
                 eventClick: function(info) {
                     if (info.event.extendedProps.disponible) {
-                        // Afficher les détails du créneau disponible
-                        fetch(`{{ path('app_rdv_api_creneau_details', {id: 'CRENEAU_ID'}) }}`.replace('CRENEAU_ID', info.event.id))
-                            .then(response => response.json())
-                            .then(data => {
-                                document.getElementById('creneauDetails').innerHTML = `
-                                    <p><strong>Date :</strong> ${data.dateDebut}</p>
-                                    <p><strong>Durée :</strong> ${data.dateDebut} - ${data.dateFin}</p>
-                                    ${data.titre ? `<p><strong>Type :</strong> ${data.titre}</p>` : ''}
-                                    ${data.description ? `<p><strong>Description :</strong> ${data.description}</p>` : ''}
-                                    <div class="alert alert-success">
-                                        <i class="fas fa-check-circle me-2"></i>
-                                        Ce créneau est disponible !
-                                    </div>
-                                `;
-                                document.getElementById('btnReserver').href = `{{ path('app_rdv_reserver', {id: 'CRENEAU_ID'}) }}`.replace('CRENEAU_ID', info.event.id);
-                                modal.show();
-                            })
-                            .catch(error => {
-                                console.error('Erreur:', error);
-                                alert('Erreur lors du chargement des détails');
-                            });
+                        // Charger le formulaire de réservation
+                        loadReservationForm(info.event.id);
                     } else {
                         // Créneau non disponible
                         document.getElementById('creneauDetails').innerHTML = `
@@ -236,13 +274,153 @@
                                 Ce créneau n'est plus disponible.
                             </div>
                         `;
-                        document.getElementById('btnReserver').style.display = 'none';
+                        document.getElementById('btnConfirmerReservation').style.display = 'none';
                         modal.show();
                     }
                 }
             });
             
             calendar.render();
+
+            // Fonction pour charger le formulaire de réservation
+            function loadReservationForm(creneauId) {
+                // Afficher un loader
+                document.getElementById('creneauDetails').innerHTML = `
+                    <div class="text-center">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Chargement...</span>
+                        </div>
+                        <p class="mt-2">Chargement du formulaire...</p>
+                    </div>
+                `;
+                document.getElementById('alertContainer').innerHTML = '';
+                document.getElementById('btnConfirmerReservation').style.display = 'block';
+                modal.show();
+
+                // Charger les détails et le formulaire
+                fetch(`{{ path('app_rdv_api_creneau_details', {id: 'CRENEAU_ID'}) }}`.replace('CRENEAU_ID', creneauId))
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.disponible) {
+                            document.getElementById('creneauDetails').innerHTML = data.formHtml;
+                            
+                            // Configurer la soumission du formulaire
+                            const form = document.getElementById('form-reservation');
+                            if (form) {
+                                form.addEventListener('submit', function(e) {
+                                    e.preventDefault();
+                                });
+                            }
+                        } else {
+                            document.getElementById('creneauDetails').innerHTML = `
+                                <div class="alert alert-danger">
+                                    <i class="fas fa-times-circle me-2"></i>
+                                    ${data.message}
+                                </div>
+                            `;
+                            document.getElementById('btnConfirmerReservation').style.display = 'none';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Erreur:', error);
+                        document.getElementById('creneauDetails').innerHTML = `
+                            <div class="alert alert-danger">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                Erreur lors du chargement du formulaire. Veuillez réessayer.
+                            </div>
+                        `;
+                        document.getElementById('btnConfirmerReservation').style.display = 'none';
+                    });
+            }
+
+            // Gestionnaire pour le bouton de confirmation
+            document.getElementById('btnConfirmerReservation').addEventListener('click', function() {
+                const form = document.getElementById('form-reservation');
+                if (!form) {
+                    return;
+                }
+
+                // Validation côté client
+                if (!form.checkValidity()) {
+                    form.classList.add('was-validated');
+                    return;
+                }
+
+                // Désactiver le bouton pendant l'envoi
+                this.disabled = true;
+                this.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Envoi en cours...';
+
+                // Préparer les données du formulaire
+                const formData = new FormData(form);
+
+                // Envoyer la requête AJAX
+                fetch(form.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Fermer la modal
+                        modal.hide();
+                        
+                        // Afficher un message de succès temporaire
+                        const alertDiv = document.createElement('div');
+                        alertDiv.className = 'alert alert-success alert-dismissible fade show position-fixed';
+                        alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+                        alertDiv.innerHTML = `
+                            <i class="fas fa-check-circle me-2"></i>
+                            ${data.message}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        `;
+                        document.body.appendChild(alertDiv);
+
+                        // Recharger le calendrier pour mettre à jour l'affichage
+                        calendar.refetchEvents();
+
+                        // Supprimer l'alerte après 5 secondes
+                        setTimeout(() => {
+                            if (alertDiv.parentNode) {
+                                alertDiv.remove();
+                            }
+                        }, 5000);
+                    } else {
+                        // Afficher les erreurs
+                        let errorMessage = data.message;
+                        if (data.errors && data.errors.length > 0) {
+                            errorMessage += '<ul class="mb-0 mt-2">';
+                            data.errors.forEach(error => {
+                                errorMessage += `<li>${error}</li>`;
+                            });
+                            errorMessage += '</ul>';
+                        }
+
+                        document.getElementById('alertContainer').innerHTML = `
+                            <div class="alert alert-danger">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                ${errorMessage}
+                            </div>
+                        `;
+                    }
+                })
+                .catch(error => {
+                    console.error('Erreur:', error);
+                    document.getElementById('alertContainer').innerHTML = `
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            Une erreur est survenue. Veuillez réessayer.
+                        </div>
+                    `;
+                })
+                .finally(() => {
+                    // Réactiver le bouton
+                    this.disabled = false;
+                    this.innerHTML = '<i class="fas fa-check me-2"></i>Confirmer la réservation';
+                });
+            });
         });
     </script>
 {% endblock %} 

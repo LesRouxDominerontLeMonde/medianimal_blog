@@ -13,7 +13,6 @@
 .footer-container {
     width: calc(100vw - 18px);
     margin: 0;
-    padding-left: var(--bord);
     padding-right: var(--bord);
     box-sizing: border-box;
     display: flex;

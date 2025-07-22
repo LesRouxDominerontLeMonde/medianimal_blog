@@ -125,9 +125,29 @@
 
         <!-- Navigation de retour -->
         <nav class="article-navigation">
+            {% if previousArticle %}
+                <a href="{{ path('app_article_show', {id: previousArticle.id}) }}" class="nav-button">
+                    ← Article précédent
+                </a>
+            {% else %}
+                <span class="nav-button nav-button-disabled">
+                    ← Article précédent
+                </span>
+            {% endif %}
+            
             <a href="{{ path('app_blog') }}" class="back-to-blog">
-                ← Retour au blog
+                Retour au blog
             </a>
+            
+            {% if nextArticle %}
+                <a href="{{ path('app_article_show', {id: nextArticle.id}) }}" class="nav-button">
+                    Article suivant →
+                </a>
+            {% else %}
+                <span class="nav-button nav-button-disabled">
+                    Article suivant →
+                </span>
+            {% endif %}
         </nav>
     </div>
 
