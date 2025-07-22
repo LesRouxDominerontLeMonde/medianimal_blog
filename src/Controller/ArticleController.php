@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use App\Entity\Article;
-use App\Form\ArticleForm;
 use App\Repository\ArticleRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\Pagination\Paginator;
@@ -15,24 +14,6 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/article')]
 final class ArticleController extends AbstractController
 {
-    #[Route(name: 'app_article_index', methods: ['GET'])]
-    public function index(ArticleRepository $articleRepository): Response
-    {
-        $articles = $articleRepository->createQueryBuilder('a')
-            ->where('a.isPublished = :published')
-            ->andWhere('a.publishedAt IS NOT NULL')
-            ->andWhere('a.publishedAt <= :now')
-            ->setParameter('published', true)
-            ->setParameter('now', new \DateTimeImmutable())
-            ->orderBy('a.publishedAt', 'DESC')
-            ->getQuery()
-            ->getResult();
-
-        return $this->render('article/index.html.twig', [
-            'articles' => $articles,
-        ]);
-    }
-
     #[Route('/blog', name: 'app_blog', methods: ['GET'])]
     public function blog(Request $request, ArticleRepository $articleRepository): Response
     {
