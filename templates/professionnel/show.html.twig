@@ -1,0 +1,556 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ professionnel.prenom }} {{ professionnel.nom }} - {{ professionnel.ville }}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .professionnel-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 3rem 1rem;
+        }
+
+        .professionnel-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .professionnel-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--color-noir);
+            margin-bottom: 0.5rem;
+            line-height: 1.2;
+        }
+
+        .professionnel-subtitle {
+            font-size: 1.2rem;
+            color: var(--color-texte);
+            margin-bottom: 0;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .info-card, .map-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .card-header {
+            background: var(--color-accent);
+            color: var(--color-noir);
+            padding: 1.5rem;
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .card-header i {
+            margin-right: 0.5rem;
+        }
+
+        .card-body {
+            padding: 2rem;
+        }
+
+        .info-item {
+            margin-bottom: 1.5rem;
+        }
+
+        .info-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .info-label {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--color-noir);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .info-label i {
+            margin-right: 0.5rem;
+            color: var(--color-accent);
+            width: 20px;
+        }
+
+        .info-value {
+            color: var(--color-texte);
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        .info-value a {
+            color: var(--color-noir);
+            text-decoration: none;
+        }
+
+        .info-value a:hover {
+            text-decoration: underline;
+        }
+
+        .map-container {
+            height: 400px;
+            width: 100%;
+        }
+
+        .reviews-section {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .reviews-stats {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .reviews-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--color-noir);
+            margin-bottom: 1.5rem;
+        }
+
+        .rating-summary {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .average-rating {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .rating-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--color-noir);
+        }
+
+        .stars-display {
+            display: flex;
+            gap: 0.2rem;
+        }
+
+        .star-filled {
+            color: #fbbf24;
+        }
+
+        .star-empty {
+            color: #d1d5db;
+        }
+
+        .reviews-count {
+            color: var(--color-texte);
+            font-size: 1rem;
+        }
+
+        .no-reviews {
+            color: var(--color-texte);
+            font-style: italic;
+        }
+
+        .comments-list {
+            margin-bottom: 3rem;
+        }
+
+        .comments-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--color-noir);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--color-accent);
+        }
+
+        .comment-item {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .comment-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .comment-author {
+            font-weight: 600;
+            color: var(--color-noir);
+        }
+
+        .comment-rating {
+            display: flex;
+            gap: 0.2rem;
+        }
+
+        .comment-date {
+            color: var(--color-texte);
+            font-size: 0.9rem;
+            margin-left: auto;
+        }
+
+        .comment-text {
+            color: var(--color-texte);
+            line-height: 1.6;
+        }
+
+        .add-comment {
+            border-top: 2px solid var(--color-accent);
+            padding-top: 2rem;
+        }
+
+        .add-comment-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--color-noir);
+            margin-bottom: 1.5rem;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .alert-success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+
+        .comment-form {
+            max-width: 100%;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: var(--color-noir);
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control {
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--color-accent);
+            box-shadow: 0 0 0 2px rgba(221, 190, 169, 0.2);
+        }
+
+        .form-help {
+            font-size: 0.8rem;
+            color: var(--color-texte);
+            margin-top: 0.3rem;
+        }
+
+        .form-errors {
+            color: #dc3545;
+            font-size: 0.9rem;
+            margin-top: 0.3rem;
+        }
+
+        .form-submit {
+            text-align: center;
+        }
+
+        .btn {
+            background: var(--color-accent);
+            color: var(--color-noir);
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn:hover {
+            background: #c9a876;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        @media (min-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .comment-header {
+                flex-wrap: nowrap;
+            }
+
+            .rating-summary {
+                flex-direction: row;
+            }
+        }
+
+        .back-button-container {
+            text-align: center;
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            background: var(--color-accent);
+            color: var(--color-noir);
+            padding: 1rem 2rem;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .back-button:hover {
+            background: #c9a876;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+            color: var(--color-noir);
+            text-decoration: none;
+        }
+
+        .back-button i {
+            margin-right: 0.5rem;
+        }
+
+        /* Responsive */
+        @media (min-width: 768px) {
+            .content-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .professionnel-title {
+                font-size: 3rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .professionnel-container {
+                padding: 2rem 0.5rem;
+            }
+
+            .professionnel-title {
+                font-size: 2rem;
+            }
+
+            .card-body {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="professionnel-container">
+    <!-- En-tête -->
+    <div class="professionnel-header">
+        <h1 class="professionnel-title">{{ professionnel.prenom }} {{ professionnel.nom }}</h1>
+        <p class="professionnel-subtitle">Professionnel en médiation animale</p>
+    </div>
+
+    <!-- Contenu principal -->
+    <div class="content-grid">
+        <!-- Informations du professionnel -->
+        <div class="info-card">
+            <div class="card-header">
+                <i class="fas fa-user"></i> Informations
+            </div>
+            <div class="card-body">
+                <div class="info-item">
+                    <div class="info-label">
+                        <i class="fas fa-map-marker-alt"></i> Adresse
+                    </div>
+                    <div class="info-value">
+                        {{ professionnel.adresse }}<br>
+                        {{ professionnel.codePostal }} {{ professionnel.ville }}
+                    </div>
+                </div>
+                
+                <div class="info-item">
+                    <div class="info-label">
+                        <i class="fas fa-phone"></i> Téléphone
+                    </div>
+                    <div class="info-value">
+                        <a href="tel:{{ professionnel.telephone }}">{{ professionnel.telephone }}</a>
+                    </div>
+                </div>
+
+                {% if professionnel.siteWeb %}
+                <div class="info-item">
+                    <div class="info-label">
+                        <i class="fas fa-globe"></i> Site web
+                    </div>
+                    <div class="info-value">
+                        <a href="{{ professionnel.siteWeb }}" target="_blank">{{ professionnel.siteWeb }}</a>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Carte -->
+        <div class="map-card">
+            <div class="card-header">
+                <i class="fas fa-map"></i> Localisation
+            </div>
+            <div class="map-container">
+                {{ ux_map(map, {style: 'height: 100%; width: 100%;'}) }}
+            </div>
+        </div>
+    </div>
+
+    <!-- Section Avis et Commentaires -->
+    <div class="reviews-section">
+        <!-- Statistiques des avis -->
+        <div class="reviews-stats">
+            <h3 class="reviews-title">Avis clients</h3>
+            {% if totalCommentaires > 0 %}
+                <div class="rating-summary">
+                    <div class="average-rating">
+                        <span class="rating-number">{{ averageRating }}</span>
+                        <div class="stars-display">
+                            {% for i in 1..5 %}
+                                {% if i <= averageRating %}
+                                    <i class="fas fa-star star-filled"></i>
+                                {% elseif i - 0.5 <= averageRating %}
+                                    <i class="fas fa-star-half-alt star-filled"></i>
+                                {% else %}
+                                    <i class="far fa-star star-empty"></i>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                        <span class="reviews-count">{{ totalCommentaires }} avis</span>
+                    </div>
+                </div>
+            {% else %}
+                <p class="no-reviews">Aucun avis pour le moment. Soyez le premier à laisser un commentaire !</p>
+            {% endif %}
+        </div>
+
+        <!-- Liste des commentaires -->
+        {% if commentaires|length > 0 %}
+            <div class="comments-list">
+                <h4 class="comments-title">Commentaires</h4>
+                {% for commentaire in commentaires %}
+                    <div class="comment-item">
+                        <div class="comment-header">
+                            <div class="comment-author">{{ commentaire.nom }}</div>
+                            <div class="comment-rating">
+                                {% for star in commentaire.starsArray %}
+                                    {% if star %}
+                                        <i class="fas fa-star star-filled"></i>
+                                    {% else %}
+                                        <i class="far fa-star star-empty"></i>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                            <div class="comment-date">{{ commentaire.dateCreationFormatted }}</div>
+                        </div>
+                        <div class="comment-text">{{ commentaire.commentaire }}</div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <!-- Formulaire d'ajout de commentaire -->
+        <div class="add-comment">
+            <h4 class="add-comment-title">Laisser un avis</h4>
+            
+            {% for flash_message in app.flashes('success') %}
+                <div class="alert alert-success">{{ flash_message }}</div>
+            {% endfor %}
+
+            {{ form_start(commentaireForm, {'attr': {'class': 'comment-form'}}) }}
+                <div class="form-grid">
+                    <div class="form-group">
+                        {{ form_label(commentaireForm.nom) }}
+                        {{ form_widget(commentaireForm.nom) }}
+                        {{ form_errors(commentaireForm.nom) }}
+                    </div>
+                    
+                    <div class="form-group">
+                        {{ form_label(commentaireForm.rating) }}
+                        {{ form_widget(commentaireForm.rating) }}
+                        {{ form_errors(commentaireForm.rating) }}
+                    </div>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        {{ form_label(commentaireForm.email) }}
+                        {{ form_widget(commentaireForm.email) }}
+                        {{ form_help(commentaireForm.email) }}
+                        {{ form_errors(commentaireForm.email) }}
+                    </div>
+                    
+                    <div class="form-group">
+                        {{ form_label(commentaireForm.telephone) }}
+                        {{ form_widget(commentaireForm.telephone) }}
+                        {{ form_help(commentaireForm.telephone) }}
+                        {{ form_errors(commentaireForm.telephone) }}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    {{ form_label(commentaireForm.commentaire) }}
+                    {{ form_widget(commentaireForm.commentaire) }}
+                    {{ form_help(commentaireForm.commentaire) }}
+                    {{ form_errors(commentaireForm.commentaire) }}
+                </div>
+
+                <div class="form-submit">
+                    {{ form_widget(commentaireForm.submit) }}
+                </div>
+            {{ form_end(commentaireForm) }}
+        </div>
+    </div>
+
+    <!-- Bouton de retour -->
+    <div class="back-button-container">
+        <a href="{{ path('app_map') }}" class="back-button">
+            <i class="fas fa-arrow-left"></i> Retour à la carte
+        </a>
+    </div>
+</div>
+{% endblock %} 

@@ -191,4 +191,16 @@ class Professionnel
     {
         return sprintf('%s, %s %s', $this->adresse, $this->codePostal, $this->ville);
     }
+
+    /**
+     * Génère un slug pour l'URL au format PrenomNomVille
+     */
+    public function getSlug(): string
+    {
+        $slug = sprintf('%s%s%s', $this->prenom, $this->nom, $this->ville);
+        // Suppression des espaces, accents et caractères spéciaux
+        $slug = iconv('UTF-8', 'ASCII//TRANSLIT', $slug);
+        $slug = preg_replace('/[^a-zA-Z0-9]/', '', $slug);
+        return $slug;
+    }
 }
