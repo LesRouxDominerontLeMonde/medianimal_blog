@@ -35,10 +35,20 @@ function adjustBannerPosition() {
     const banner = document.querySelector('.blog-banner');
     const body = document.body;
     
-    if (!navbar) return;
+    if (!navbar) {
+        // Réessayer après un court délai si la navbar n'est pas encore trouvée
+        setTimeout(adjustBannerPosition, 50);
+        return;
+    }
     
     // Mesurer la hauteur réelle de la navbar
     const navbarHeight = navbar.offsetHeight;
+    
+    // Vérifier que la hauteur est valide (parfois 0 si le CSS n'est pas encore appliqué)
+    if (navbarHeight === 0) {
+        setTimeout(adjustBannerPosition, 50);
+        return;
+    }
     
     // Appliquer le padding-top au body pour compenser la navbar fixed
     body.style.paddingTop = navbarHeight + 'px';
@@ -124,3 +134,7 @@ window.addEventListener('resize', function() {
 
 // Réajuster après le chargement complet (polices, etc.)
 window.addEventListener('load', adjustBannerPosition);
+
+// Support pour Turbo (navigations sans rechargement)
+document.addEventListener('turbo:load', adjustBannerPosition);
+document.addEventListener('turbo:render', adjustBannerPosition);

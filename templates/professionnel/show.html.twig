@@ -45,7 +45,7 @@
         }
 
         .card-header {
-            background: var(--color-accent);
+            background: #f8f9fa;
             color: var(--color-noir);
             padding: 1.5rem;
             font-size: 1.3rem;
@@ -291,10 +291,11 @@
         }
 
         .btn {
-            background: var(--color-accent);
-            color: var(--color-noir);
+            background: transparent;
+            color: #666;
             padding: 1rem 2rem;
-            border: none;
+            margin-top: 1rem;
+            border: 1px solid #666;
             border-radius: 25px;
             font-weight: 600;
             font-size: 1.1rem;
@@ -305,9 +306,10 @@
         }
 
         .btn:hover {
-            background: #c9a876;
+            color: var(--color-accent);
+            background-color: rgba(221, 190, 169, 0.1);
+            border-color: var(--color-accent);
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
         }
 
         @media (min-width: 768px) {
@@ -331,23 +333,23 @@
         .back-button {
             display: inline-flex;
             align-items: center;
-            background: var(--color-accent);
-            color: var(--color-noir);
+            background: transparent;
+            color: #666;
             padding: 1rem 2rem;
+            border: 1px solid #666;
             border-radius: 25px;
             text-decoration: none;
             font-weight: 600;
             font-size: 1.1rem;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
 
         .back-button:hover {
-            background: #c9a876;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-            color: var(--color-noir);
+            color: var(--color-accent);
+            background-color: rgba(221, 190, 169, 0.1);
             text-decoration: none;
+            border-color: var(--color-accent);
+            transform: translateY(-2px);
         }
 
         .back-button i {

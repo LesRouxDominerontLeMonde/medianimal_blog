@@ -3,13 +3,16 @@
 namespace App\Controller;
 
 use App\Entity\Commentaire;
+use App\Entity\Professionnel;
 use App\Form\CommentaireType;
+use App\Form\ProfessionnelType;
 use App\Repository\CommentaireRepository;
 use App\Repository\ProfessionnelRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\UX\Map\Map;
 use Symfony\UX\Map\Point;
@@ -117,11 +120,49 @@ final class MapController extends AbstractController
             }
         }
 
+        // Création du formulaire pour ajouter un professionnel
+        $nouveauProfessionnel = new Professionnel();
+        $professionnelForm = $this->createForm(ProfessionnelType::class, $nouveauProfessionnel);
+
         return $this->render('map/index.html.twig', [
             'map' => $map,
             'professionnels' => $professionnels,
-            'totalProfessionnels' => count($professionnels)
+            'totalProfessionnels' => count($professionnels),
+            'professionnelForm' => $professionnelForm->createView()
         ]);
+    }
+
+    #[Route('/map/ajouter-professionnel', name: 'app_map_add_professionnel', methods: ['POST'])]
+    public function ajouterProfessionnel(Request $request, EntityManagerInterface $entityManager): JsonResponse
+    {
+        $professionnel = new Professionnel();
+        $form = $this->createForm(ProfessionnelType::class, $professionnel);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $entityManager->persist($professionnel);
+            $entityManager->flush();
+
+            return new JsonResponse([
+                'success' => true,
+                'message' => 'Merci d\'avoir aidé à remplir cette carte :D',
+                'professionnel' => [
+                    'slug' => $professionnel->getSlug(),
+                    'nom' => $professionnel->getPrenom() . ' ' . $professionnel->getNom()
+                ]
+            ]);
+        }
+
+        // Récupération des erreurs
+        $errors = [];
+        foreach ($form->getErrors(true) as $error) {
+            $errors[] = $error->getMessage();
+        }
+
+        return new JsonResponse([
+            'success' => false,
+            'errors' => $errors
+        ], 400);
     }
 
     #[Route('/{slug}', name: 'app_professionnel_show', methods: ['GET', 'POST'])]

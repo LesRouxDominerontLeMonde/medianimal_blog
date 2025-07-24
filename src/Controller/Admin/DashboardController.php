@@ -12,6 +12,7 @@ use App\Entity\Article;
 use App\Entity\Creneau;
 use App\Entity\RendezVous;
 use App\Entity\Professionnel;
+use App\Entity\Commentaire;
 use App\Repository\RendezVousRepository;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -76,6 +77,8 @@ class DashboardController extends AbstractDashboardController
             
         yield MenuItem::section('Professionnels');
         yield MenuItem::linkToCrud('Professionnels', 'fas fa-map-marker-alt', Professionnel::class)
+            ->setPermission('ROLE_ADMIN');
+        yield MenuItem::linkToCrud('Commentaires', 'fas fa-comments', Commentaire::class)
             ->setPermission('ROLE_ADMIN');
             
         yield MenuItem::section('Administration');
